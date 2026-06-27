@@ -346,6 +346,14 @@
     return 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
   }
 
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  function ytMusicAppLink(videoId){
+    const target = 'music.youtube.com/watch?v=' + videoId;
+    if (!isAndroid) return 'https://' + target;
+    const fallback = encodeURIComponent('https://' + target);
+    return 'intent://' + target + '#Intent;scheme=https;package=com.google.android.apps.youtube.music;S.browser_fallback_url=' + fallback + ';end';
+  }
+
   function parseTitleArtist(snippetTitle, channelTitle){
     let artist = (channelTitle || '').replace(/\s*-\s*Topic$/i, '').trim();
     let title = snippetTitle;
@@ -470,7 +478,7 @@
     els.recapCover = document.getElementById('tokRecapCover');
     els.recapTitle.textContent = t.title;
     els.recapArtist.textContent = t.artist;
-    els.openInApp.href = 'https://music.youtube.com/watch?v=' + t.id;
+    els.openInApp.href = ytMusicAppLink(t.id);
 
     currentCandidates = pickCandidates();
     state.armedDir = 'stay';
