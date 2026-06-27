@@ -261,10 +261,8 @@
           </svg>
           <div class="tok-ring-center">
             <div class="tok-secs" id="tokSecs">20</div>
-            <div class="tok-secs-label">sek do kraja</div>
           </div>
         </div>
-        <div class="tok-ring-caption">odabir se izvrši na kraju pjesme — do tad ga možeš <strong>promijeniti koliko hoćeš</strong></div>
       </div>
 
       <div class="tok-options" id="tokOptions">
@@ -299,7 +297,7 @@
     </div>
   </div>
 
-  <div class="tok-note">Pill je dostupan cijelu pjesmu — dodirni ga da otvoriš/zatvoriš opcije. Odabir se ne izvrši odmah: tek kad pjesma stvarno završi koristi se ono što je trenutno naznačeno na pillu (default ZADRŽI ako ništa ne dirneš).</div>
+  <a class="tok-note" id="tokOpenInApp" href="#" target="_blank" rel="noopener" style="display:block; text-decoration:none;">▶ otvori u YouTube Music</a>
 </div>
 
 <script>
@@ -336,7 +334,8 @@
     recapArtist: document.getElementById('tokRecapArtist'),
     secs: document.getElementById('tokSecs'),
     ring: document.getElementById('tokRing'),
-    options: document.getElementById('tokOptions')
+    options: document.getElementById('tokOptions'),
+    openInApp: document.getElementById('tokOpenInApp')
   };
 
   const CIRC = 2 * Math.PI * 86;
@@ -471,6 +470,7 @@
     els.recapCover = document.getElementById('tokRecapCover');
     els.recapTitle.textContent = t.title;
     els.recapArtist.textContent = t.artist;
+    els.openInApp.href = 'https://music.youtube.com/watch?v=' + t.id;
 
     currentCandidates = pickCandidates();
     state.armedDir = 'stay';
@@ -571,7 +571,7 @@
     els.progress.style.width = Math.min(100, (cur / dur) * 100) + '%';
     els.progress.style.background = 'var(--' + (state.armedDir === 'speed' ? 'ember' : state.armedDir === 'slow' ? 'tide' : 'dusk') + ')';
     const remainSec = Math.max(0, Math.ceil(dur - cur));
-    els.remain.textContent = 'ostalo ' + remainSec + 's u pjesmi';
+    els.remain.textContent = remainSec + 's';
 
     if (state.sheetOpen) {
       els.secs.textContent = remainSec;
