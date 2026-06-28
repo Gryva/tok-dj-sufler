@@ -219,11 +219,16 @@
       return;
     }
 
+    const candidateIdxs = new Set(
+      currentCandidates ? ['up', 'flow', 'down'].map(dir => currentCandidates[dir].idx) : []
+    );
+
     els.queue.innerHTML = indices.map(i => {
       const t = tracks[i];
       const isCurrent = i === currentIndex;
+      const isCandidate = !isCurrent && candidateIdxs.has(i);
       const bpm = window.TokEngine ? window.TokEngine.getBPM(t) : null;
-      return '<button class="tok-queue-row' + (isCurrent ? ' current' : '') + '" data-idx="' + i + '">' +
+      return '<button class="tok-queue-row' + (isCurrent ? ' current' : '') + (isCandidate ? ' candidate' : '') + '" data-idx="' + i + '">' +
         '<div class="tok-cover--queue" style="background-image:url(\'' + t.thumb + '\')"></div>' +
         '<div class="tok-queue-meta"><div class="tok-queue-title">' + t.title + '</div>' +
         '<div class="tok-queue-artist">' + t.artist + '</div></div>' +
