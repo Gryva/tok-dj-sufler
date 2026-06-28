@@ -124,14 +124,14 @@ html, body { height:100%; margin:0; }
 .tok-dir {
   position:relative; z-index:1;
   border:none; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
-  background: rgba(36,25,20,0.55); border-radius:16px; padding:10px 14px; display:flex; align-items:center; gap:12px;
+  background: rgba(20,14,11,0.82); border-radius:16px; padding:10px 14px; display:flex; align-items:center; gap:12px;
   min-height:62px; opacity:0.55;
   transition: opacity 0.2s, background 0.45s ease-out,
     transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation;
 }
 .tok-dir:active { transform:scale(0.96); transition: transform 0.08s ease-out; }
-.tok-dir.chosen { opacity:1; background:rgba(36,25,20,0.55); }
+.tok-dir.chosen { opacity:1; background:rgba(20,14,11,0.82); }
 .tok-dir-cover { width:40px; height:40px; border-radius:12px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--sheet); }
 .tok-dir-meta { flex:1; min-width:0; }
 .tok-dir-track { font-family:'Fraunces',serif; font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
