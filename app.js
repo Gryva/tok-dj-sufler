@@ -352,6 +352,10 @@
   attachLongPress(els.queue, '.tok-queue-row', (row) => parseInt(row.getAttribute('data-idx'), 10));
   if (els.vinylWrap) attachLongPress(els.vinylWrap, '.tok-vinyl-wrap', () => currentIndex);
   if (els.nowMeta) attachLongPress(els.nowMeta, '.tok-nowmeta', () => currentIndex);
+  attachLongPress(els.dirs, '.tok-dir', (card) => {
+    const dir = card.getAttribute('data-dir');
+    return currentCandidates ? currentCandidates[dir].idx : currentIndex;
+  });
 
   let songModalTrack = null;
   function openSongModal(idx){
@@ -426,7 +430,7 @@
 
   els.dirs.addEventListener('click', (e) => {
     const card = e.target.closest('.tok-dir');
-    if (!card) return;
+    if (!card || card.dataset.longPressed === '1') { if (card) delete card.dataset.longPressed; return; }
     state.armedDir = card.getAttribute('data-dir');
     els.dirs.querySelectorAll('.tok-dir').forEach(c => c.classList.toggle('chosen', c === card));
   });
