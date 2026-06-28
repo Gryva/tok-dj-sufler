@@ -258,9 +258,14 @@
     longPressRow = null;
   }
 
+  els.queue.addEventListener('contextmenu', (e) => {
+    if (e.target.closest('.tok-queue-row')) e.preventDefault();
+  });
+
   els.queue.addEventListener('pointerdown', (e) => {
     const row = e.target.closest('.tok-queue-row');
     if (!row) return;
+    if (e.pointerType === 'touch') e.preventDefault();
     longPressRow = row;
     longPressTimer = setTimeout(() => {
       if (!longPressRow) return;
