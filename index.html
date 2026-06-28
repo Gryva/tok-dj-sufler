@@ -97,6 +97,21 @@
   .tok-wave-bar.played { background: var(--gold); }
 
   /* ---------- transport ---------- */
+  /* ---------- direction picker ---------- */
+  .tok-dirs { display:flex; gap:8px; width:100%; max-width:420px; margin-top:14px; }
+  .tok-dir {
+    flex:1; border:none; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
+    background: var(--stage); border-radius:18px; padding:10px 10px; display:flex; flex-direction:column; gap:6px;
+    opacity:0.55; transition: opacity 0.2s, background 0.2s, transform 0.2s;
+  }
+  .tok-dir:active { transform:scale(0.96); }
+  .tok-dir.chosen { opacity:1; background:var(--dusk); }
+  .tok-dir-cover { width:100%; aspect-ratio:1; border-radius:12px; background-size:cover; background-position:center; background-color:var(--sheet); }
+  .tok-dir-label { font-family:'Fraunces',serif; font-weight:700; font-size:11.5px; }
+  .tok-dir-track { font-size:10.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tok-dir-artist { font-size:9.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tok-dir.chosen .tok-dir-artist { color:rgba(255,255,255,0.75); }
+
   .tok-transport {
     display:flex; align-items:center; justify-content:center; gap:14px;
     background: var(--ink); border-radius:999px; padding:10px 16px; margin-top:4px;
@@ -185,6 +200,27 @@
 
     <div class="tok-wave" id="tokWave"></div>
 
+    <div class="tok-dirs" id="tokDirs">
+      <button class="tok-dir" data-dir="up">
+        <div class="tok-dir-cover"></div>
+        <div class="tok-dir-label">⬆️ Upper</div>
+        <div class="tok-dir-track"></div>
+        <div class="tok-dir-artist"></div>
+      </button>
+      <button class="tok-dir" data-dir="flow">
+        <div class="tok-dir-cover"></div>
+        <div class="tok-dir-label">🌊 Stay in the flow</div>
+        <div class="tok-dir-track"></div>
+        <div class="tok-dir-artist"></div>
+      </button>
+      <button class="tok-dir" data-dir="down">
+        <div class="tok-dir-cover"></div>
+        <div class="tok-dir-label">⬇️ Downer</div>
+        <div class="tok-dir-track"></div>
+        <div class="tok-dir-artist"></div>
+      </button>
+    </div>
+
     <div class="tok-transport">
       <button class="tok-skipbtn" id="tokPrevBtn" aria-label="Prošla pjesma">⏮</button>
       <button class="tok-playbtn" id="tokPlayBtn" aria-label="Pusti / pauziraj">▶</button>
@@ -212,8 +248,10 @@
   let tracks = [];
   let currentIndex = 0;
   let player = null;
+  let currentCandidates = null;
+  let history = [];
 
-  const state = { playing:false, queueOpen:false };
+  const state = { playing:false, queueOpen:false, armedDir:'flow' };
 
   const els = {
     playBtn: document.getElementById('tokPlayBtn'),
@@ -230,7 +268,8 @@
     backdrop: document.getElementById('tokBackdrop'),
     sheet: document.getElementById('tokSheet'),
     handle: document.getElementById('tokHandle'),
-    queue: document.getElementById('tokQueue')
+    queue: document.getElementById('tokQueue'),
+    dirs: document.getElementById('tokDirs')
   };
 
   const WAVE_BARS = 40;
@@ -342,6 +381,47 @@
     if (idx !== currentIndex) jumpToTrack(idx, true);
   });
 
+  function pickCandidates(){
+    const n = tracks.length;
+    const flowIdx = (currentIndex + 1) % n;
+    const used = new Set(history.slice(-3).map(t => t.id).concat([tracks[currentIndex].id, tracks[flowIdx].id]));
+    function pickRandom(exclude){
+      const opts = tracks.filter(t => !used.has(t.id) && !exclude.has(t.id));
+      const pool = opts.length ? opts : tracks.filter(t => t.id !== tracks[currentIndex].id);
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+    const upT = pickRandom(new Set());
+    const downT = pickRandom(new Set([upT.id]));
+    return { up: upT, flow: tracks[flowIdx], down: downT };
+  }
+
+  function renderDirs(){
+    currentCandidates = pickCandidates();
+    state.armedDir = 'flow';
+    ['up','flow','down'].forEach(dir => {
+      const card = els.dirs.querySelector('[data-dir="' + dir + '"]');
+      const t = currentCandidates[dir];
+      card.querySelector('.tok-dir-cover').style.backgroundImage = "url('" + t.thumb + "')";
+      card.querySelector('.tok-dir-track').textContent = t.title;
+      card.querySelector('.tok-dir-artist').textContent = t.artist;
+      card.classList.toggle('chosen', dir === state.armedDir);
+    });
+  }
+
+  els.dirs.addEventListener('click', (e) => {
+    const card = e.target.closest('.tok-dir');
+    if (!card) return;
+    state.armedDir = card.getAttribute('data-dir');
+    els.dirs.querySelectorAll('.tok-dir').forEach(c => c.classList.toggle('chosen', c === card));
+  });
+
+  function commitEndOfSong(){
+    const picked = currentCandidates[state.armedDir];
+    history.push(tracks[currentIndex]);
+    currentIndex = tracks.findIndex(t => t.id === picked.id);
+    loadCurrentTrack(true);
+  }
+
   function updateMediaSession(t){
     if (!('mediaSession' in navigator)) return;
     navigator.mediaSession.metadata = new MediaMetadata({
@@ -368,6 +448,7 @@
     els.status.textContent = '';
     els.ytLink.href = braveLink(t.id);
     renderQueue();
+    renderDirs();
     updateMediaSession(t);
 
     if (player && typeof player.loadVideoById === 'function') {
@@ -405,7 +486,7 @@
       els.vinyl.classList.remove('spinning');
       if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
     } else if (e.data === YT.PlayerState.ENDED) {
-      jumpToTrack((currentIndex + 1) % tracks.length, true);
+      commitEndOfSong();
     }
   }
 
