@@ -43,7 +43,7 @@
   }
   .tok-app * { box-sizing: border-box; }
 
-  .tok-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .tok-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
   .tok-wordmark { font-family:'Fraunces',serif; font-weight:900; font-size:24px; letter-spacing:0.2px; }
   .tok-head-actions { display:flex; align-items:center; gap:8px; }
   .tok-yt-link {
@@ -60,12 +60,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 4px 0;
+    gap: 18px;
+    padding: 8px 0;
   }
 
   /* ---------- vinyl ---------- */
-  .tok-vinyl-wrap { position:relative; width: min(40vw, 170px); aspect-ratio: 1; flex-shrink: 0; }
+  .tok-vinyl-wrap { position:relative; width: min(48vw, 210px); aspect-ratio: 1; flex-shrink: 0; }
 
   /* cover art sits behind the ring and spins on its own */
   .tok-vinyl-cover {
@@ -100,44 +100,44 @@
 
 
   .tok-nowmeta { text-align:center; width:100%; max-width: 420px; }
-  .tok-now-title { font-family:'Fraunces',serif; font-weight:700; font-size:16px; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .tok-now-artist { color:var(--muted); font-size:12px; margin-top:2px; }
+  .tok-now-title { font-family:'Fraunces',serif; font-weight:700; font-size:19px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tok-now-artist { color:var(--muted); font-size:13.5px; margin-top:4px; }
 
   /* ---------- soundwave progress ---------- */
-  .tok-wave { display:flex; align-items:center; gap:3px; margin-top:6px; width:100%; max-width:320px; height:20px; cursor:pointer; }
+  .tok-wave { display:flex; align-items:center; gap:3px; margin-top:8px; width:100%; max-width:320px; height:24px; cursor:pointer; }
   .tok-wave-bar { flex:1; min-width:2px; border-radius:3px; background:rgba(255,255,255,0.14); transition: background 0.2s; }
   .tok-wave-bar.played { background: var(--wave-accent, var(--gold)); }
 
   /* ---------- transport ---------- */
   /* ---------- direction picker ---------- */
-  .tok-dirs { display:flex; flex-direction:column; gap:6px; width:100%; max-width:420px; margin-top:6px; }
+  .tok-dirs { display:flex; flex-direction:column; gap:10px; width:100%; max-width:420px; margin-top:10px; }
   .tok-dir {
     border:none; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
-    background: var(--stage); border-radius:14px; padding:6px 10px; display:flex; align-items:center; gap:10px;
+    background: var(--stage); border-radius:16px; padding:10px 14px; display:flex; align-items:center; gap:12px;
     opacity:0.55; transition: opacity 0.2s, background 0.2s, transform 0.2s;
   }
   .tok-dir:active { transform:scale(0.98); }
   .tok-dir.chosen { opacity:1; background:var(--dusk); }
-  .tok-dir-cover { width:34px; height:34px; border-radius:10px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--sheet); }
+  .tok-dir-cover { width:40px; height:40px; border-radius:12px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--sheet); }
   .tok-dir-meta { flex:1; min-width:0; }
-  .tok-dir-track { font-family:'Fraunces',serif; font-weight:700; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .tok-dir-artist { font-size:10px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+  .tok-dir-track { font-family:'Fraunces',serif; font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tok-dir-artist { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
   .tok-dir.chosen .tok-dir-artist { color:rgba(255,255,255,0.75); }
   .tok-dir-icon { flex-shrink:0; color:var(--muted); display:flex; }
-  .tok-dir-icon svg { width:17px; height:17px; }
+  .tok-dir-icon svg { width:19px; height:19px; }
   .tok-dir.chosen .tok-dir-icon { color:#fff; }
 
   .tok-transport {
-    display:flex; align-items:center; justify-content:center; gap:14px;
-    background: var(--ink); border-radius:999px; padding:7px 14px; margin-top:2px;
+    display:flex; align-items:center; justify-content:center; gap:16px;
+    background: var(--ink); border-radius:999px; padding:9px 16px; margin-top:4px;
   }
   .tok-transport button {
     border:none; cursor:pointer; color:var(--bg); font-family:inherit;
     display:flex; align-items:center; justify-content:center; background:transparent;
   }
-  .tok-skipbtn { width:34px; height:34px; border-radius:50%; font-size:14px; }
+  .tok-skipbtn { width:38px; height:38px; border-radius:50%; font-size:15px; }
   .tok-skipbtn:active { transform:scale(0.92); }
-  .tok-playbtn { width:44px; height:44px; border-radius:50%; background:var(--dusk); color:var(--ink); font-size:16px; }
+  .tok-playbtn { width:50px; height:50px; border-radius:50%; background:var(--dusk); color:var(--ink); font-size:18px; }
   .tok-playbtn:active { transform:scale(0.94); }
 
   .tok-queue-toggle {
