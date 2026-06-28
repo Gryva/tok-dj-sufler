@@ -38,7 +38,6 @@
     queue: document.getElementById('tokQueue'),
     queueSearch: document.getElementById('tokQueueSearch'),
     dirs: document.getElementById('tokDirs'),
-    liquidBg: document.getElementById('tokLiquidBg'),
     changePlaylist: document.getElementById('tokChangePlaylist'),
     playlistBackdrop: document.getElementById('tokPlaylistBackdrop'),
     playlistInput: document.getElementById('tokPlaylistInput'),
@@ -401,34 +400,6 @@
     return window.TokEngine.getSuggestions({ tracks, currentIndex, mode: state.order, history });
   }
 
-  function updateLiquidPosition(){
-    if (!els.liquidBg) return;
-    els.liquidBg.classList.remove('pos-up', 'pos-flow', 'pos-down');
-    els.liquidBg.classList.add('pos-' + state.armedDir);
-  }
-
-  function layoutLiquidWindows(){
-    if (!els.liquidBg) return;
-    const containerTop = els.dirs.getBoundingClientRect().top;
-    const containerHeight = els.dirs.getBoundingClientRect().height;
-    ['up', 'flow', 'down'].forEach(dir => {
-      const card = els.dirs.querySelector('.tok-dir[data-dir="' + dir + '"]');
-      const win = els.liquidBg.querySelector('.tok-liquid-window[data-dir="' + dir + '"]');
-      if (!card || !win) return;
-      const r = card.getBoundingClientRect();
-      const top = r.top - containerTop;
-      win.style.top = top + 'px';
-      win.style.height = r.height + 'px';
-      const wave = win.querySelector('.tok-liquid-wave');
-      // offset the wave upward by exactly how far this window sits from the
-      // container's top, so the texture lines up continuously across the
-      // gaps between cards (one shared flow, not three independent ones)
-      wave.style.top = (-top) + 'px';
-      wave.style.height = (containerHeight + 200) + 'px';
-    });
-  }
-  window.addEventListener('resize', layoutLiquidWindows);
-
   function renderDirs(){
     currentCandidates = pickCandidates();
     state.armedDir = 'flow';
@@ -443,8 +414,6 @@
       dirBpmEl.textContent = dirBpm ? dirBpm + ' BPM' : '';
       card.classList.toggle('chosen', dir === state.armedDir);
     });
-    updateLiquidPosition();
-    requestAnimationFrame(layoutLiquidWindows);
   }
 
   els.dirs.addEventListener('click', (e) => {
@@ -452,7 +421,6 @@
     if (!card || card.dataset.longPressed === '1') { if (card) delete card.dataset.longPressed; return; }
     state.armedDir = card.getAttribute('data-dir');
     els.dirs.querySelectorAll('.tok-dir').forEach(c => c.classList.toggle('chosen', c === card));
-    updateLiquidPosition();
   });
 
   const ORDER_ICONS = {
