@@ -38,6 +38,7 @@
     queue: document.getElementById('tokQueue'),
     queueSearch: document.getElementById('tokQueueSearch'),
     dirs: document.getElementById('tokDirs'),
+    liquidBg: document.getElementById('tokLiquidBg'),
     changePlaylist: document.getElementById('tokChangePlaylist'),
     playlistBackdrop: document.getElementById('tokPlaylistBackdrop'),
     playlistInput: document.getElementById('tokPlaylistInput'),
@@ -400,6 +401,12 @@
     return window.TokEngine.getSuggestions({ tracks, currentIndex, mode: state.order, history });
   }
 
+  function updateLiquidPosition(){
+    if (!els.liquidBg) return;
+    els.liquidBg.classList.remove('pos-up', 'pos-flow', 'pos-down');
+    els.liquidBg.classList.add('pos-' + state.armedDir);
+  }
+
   function renderDirs(){
     currentCandidates = pickCandidates();
     state.armedDir = 'flow';
@@ -414,6 +421,7 @@
       dirBpmEl.textContent = dirBpm ? dirBpm + ' BPM' : '';
       card.classList.toggle('chosen', dir === state.armedDir);
     });
+    updateLiquidPosition();
   }
 
   els.dirs.addEventListener('click', (e) => {
@@ -421,6 +429,7 @@
     if (!card || card.dataset.longPressed === '1') { if (card) delete card.dataset.longPressed; return; }
     state.armedDir = card.getAttribute('data-dir');
     els.dirs.querySelectorAll('.tok-dir').forEach(c => c.classList.toggle('chosen', c === card));
+    updateLiquidPosition();
   });
 
   const ORDER_ICONS = {
