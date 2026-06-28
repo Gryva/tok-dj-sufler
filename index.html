@@ -178,7 +178,7 @@
     cursor:pointer; text-align:left; border:none; color:var(--ink); font-family:inherit; width:100%;
   }
   .tok-queue-row:active { transform:scale(0.98); }
-  .tok-queue-row.current { background:var(--dusk); }
+  .tok-queue-row.current { background:#4a4038; }
   .tok-cover--queue { width:44px; height:44px; border-radius:13px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--stage); }
   .tok-queue-meta { flex:1; min-width:0; }
   .tok-queue-title { font-family:'Fraunces',serif; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -376,6 +376,7 @@
       pageToken = data.nextPageToken || '';
     } while (pageToken && items.length < 200);
 
+    const seenIds = new Set();
     tracks = items
       .filter(it => it.snippet && it.snippet.resourceId && it.snippet.resourceId.videoId &&
         it.snippet.title !== 'Deleted video' && it.snippet.title !== 'Private video')
@@ -383,6 +384,11 @@
         const vid = it.snippet.resourceId.videoId;
         const parsed = parseTitleArtist(it.snippet.title, it.snippet.videoOwnerChannelTitle);
         return { id: vid, title: parsed.title, artist: parsed.artist, thumb: ytThumb(vid), durationSec: 0 };
+      })
+      .filter(t => {
+        if (seenIds.has(t.id)) return false;
+        seenIds.add(t.id);
+        return true;
       });
 
     for (let i = 0; i < tracks.length; i += 50) {
@@ -436,13 +442,21 @@
     const flowIdx = (currentIndex + 1) % n;
     const used = new Set(history.slice(-3).map(t => t.id).concat([tracks[currentIndex].id, tracks[flowIdx].id]));
     function pickRandom(exclude){
-      const opts = tracks.filter(t => !used.has(t.id) && !exclude.has(t.id));
-      const pool = opts.length ? opts : tracks.filter(t => t.id !== tracks[currentIndex].id);
+      const opts = tracks
+        .map((t, idx) => ({ t, idx }))
+        .filter(({ t }) => !used.has(t.id) && !exclude.has(t.id));
+      const pool = opts.length ? opts : tracks
+        .map((t, idx) => ({ t, idx }))
+        .filter(({ idx }) => idx !== currentIndex);
       return pool[Math.floor(Math.random() * pool.length)];
     }
-    const upT = pickRandom(new Set());
-    const downT = pickRandom(new Set([upT.id]));
-    return { up: upT, flow: tracks[flowIdx], down: downT };
+    const up = pickRandom(new Set());
+    const down = pickRandom(new Set([up.t.id]));
+    return {
+      up: { t: up.t, idx: up.idx },
+      flow: { t: tracks[flowIdx], idx: flowIdx },
+      down: { t: down.t, idx: down.idx }
+    };
   }
 
   function renderDirs(){
@@ -450,7 +464,7 @@
     state.armedDir = 'flow';
     ['up','flow','down'].forEach(dir => {
       const card = els.dirs.querySelector('[data-dir="' + dir + '"]');
-      const t = currentCandidates[dir];
+      const t = currentCandidates[dir].t;
       card.querySelector('.tok-dir-cover').style.backgroundImage = "url('" + t.thumb + "')";
       card.querySelector('.tok-dir-track').textContent = t.title;
       card.querySelector('.tok-dir-artist').textContent = t.artist;
@@ -468,7 +482,7 @@
   function commitEndOfSong(){
     const picked = currentCandidates[state.armedDir];
     history.push(tracks[currentIndex]);
-    currentIndex = tracks.findIndex(t => t.id === picked.id);
+    currentIndex = picked.idx;
     loadCurrentTrack(true);
   }
 
