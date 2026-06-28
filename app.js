@@ -1,4 +1,6 @@
 (function(){
+  if (window.TokEngine) window.TokEngine.init();
+
   const YT_API_KEY = 'AIzaSyCkZpbb-oVsH_s2Yjn5AAql3Pfke0MExTA';
   const DEFAULT_PLAYLIST_ID = 'PL9qqRdUh4PoNhlUS4g69SQTxteQKHVAe-';
   let PLAYLIST_ID = localStorage.getItem('tok_playlist_id') || DEFAULT_PLAYLIST_ID;
@@ -9,7 +11,9 @@
   let currentCandidates = null;
   let history = [];
 
-  const state = { playing:false, queueOpen:false, armedDir:'flow', order: localStorage.getItem('tok_order') || 'sequential' };
+  let storedOrder = localStorage.getItem('tok_order') || 'sequential';
+  if (storedOrder === 'shuffle') storedOrder = 'curated';
+  const state = { playing:false, queueOpen:false, armedDir:'flow', order: storedOrder };
 
   const els = {
     playBtn: document.getElementById('tokPlayBtn'),
@@ -232,33 +236,7 @@
   });
 
   function pickCandidates(){
-    const n = tracks.length;
-    let flowIdx;
-    if (state.order === 'shuffle') {
-      const recent = new Set(history.slice(-3).map(t => t.id).concat([tracks[currentIndex].id]));
-      const opts = tracks.map((t, idx) => idx).filter(idx => !recent.has(tracks[idx].id));
-      const pool = opts.length ? opts : tracks.map((t, idx) => idx).filter(idx => idx !== currentIndex);
-      flowIdx = pool[Math.floor(Math.random() * pool.length)];
-    } else {
-      flowIdx = (currentIndex + 1) % n;
-    }
-    const used = new Set(history.slice(-3).map(t => t.id).concat([tracks[currentIndex].id, tracks[flowIdx].id]));
-    function pickRandom(exclude){
-      const opts = tracks
-        .map((t, idx) => ({ t, idx }))
-        .filter(({ t }) => !used.has(t.id) && !exclude.has(t.id));
-      const pool = opts.length ? opts : tracks
-        .map((t, idx) => ({ t, idx }))
-        .filter(({ idx }) => idx !== currentIndex);
-      return pool[Math.floor(Math.random() * pool.length)];
-    }
-    const up = pickRandom(new Set());
-    const down = pickRandom(new Set([up.t.id]));
-    return {
-      up: { t: up.t, idx: up.idx },
-      flow: { t: tracks[flowIdx], idx: flowIdx },
-      down: { t: down.t, idx: down.idx }
-    };
+    return window.TokEngine.getSuggestions({ tracks, currentIndex, mode: state.order, history });
   }
 
   function renderDirs(){
@@ -283,8 +261,10 @@
 
   const ORDER_ICONS = {
     sequential: '<polyline points="9 6 15 12 9 18"></polyline>',
-    shuffle: '<polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line>'
+    curated: '<polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line>',
+    pure: '<circle cx="6" cy="6" r="1.6" fill="currentColor" stroke="none"></circle><circle cx="18" cy="6" r="1.6" fill="currentColor" stroke="none"></circle><circle cx="6" cy="18" r="1.6" fill="currentColor" stroke="none"></circle><circle cx="18" cy="18" r="1.6" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"></circle>'
   };
+  const ORDER_CYCLE = ['sequential', 'curated', 'pure'];
   function setOrder(order){
     state.order = order;
     localStorage.setItem('tok_order', order);
@@ -292,7 +272,8 @@
     if (tracks.length) renderDirs();
   }
   els.orderToggle.addEventListener('click', () => {
-    setOrder(state.order === 'sequential' ? 'shuffle' : 'sequential');
+    const next = ORDER_CYCLE[(ORDER_CYCLE.indexOf(state.order) + 1) % ORDER_CYCLE.length];
+    setOrder(next);
   });
   setOrder(state.order);
 
