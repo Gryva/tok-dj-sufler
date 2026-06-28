@@ -155,7 +155,12 @@ html, body { height:100%; margin:0; }
 .tok-order-btn svg { width:16px; height:16px; }
 
 .tok-playlist-info { display:none; align-items:center; gap:10px; margin-bottom:12px; flex-shrink:0; }
-.tok-playlist-cover { width:46px; height:46px; border-radius:12px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--sheet); }
+.tok-playlist-cover {
+  width:46px; height:46px; border-radius:12px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--dusk); color:var(--ink);
+  font-family:'Fraunces',serif; font-weight:900; font-size:18px;
+}
 .tok-playlist-meta { flex:1; min-width:0; }
 .tok-playlist-name { font-family:'Fraunces',serif; font-weight:700; font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .tok-playlist-sub { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }

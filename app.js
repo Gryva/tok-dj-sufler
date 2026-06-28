@@ -148,12 +148,12 @@
     if (!res.ok) throw new Error((data.error && data.error.message) || 'YouTube API greška');
     const item = (data.items || [])[0];
     if (!item) return null;
-    const thumbs = item.snippet.thumbnails || {};
-    const thumb = (thumbs.medium || thumbs.default || thumbs.high || {}).url || '';
+    // snippet.thumbnails on a playlist resource is just the first video's
+    // thumbnail (the API doesn't expose custom playlist artwork), so we
+    // intentionally don't use it here.
     return {
       title: item.snippet.title,
       author: (item.snippet.channelTitle || '').replace(/\s*-\s*Topic$/i, '').trim(),
-      thumb,
       count: item.contentDetails ? item.contentDetails.itemCount : null
     };
   }
@@ -161,7 +161,7 @@
   function renderPlaylistInfo(){
     if (!playlistInfo) { els.playlistInfo.style.display = 'none'; return; }
     els.playlistInfo.style.display = 'flex';
-    els.playlistCover.style.backgroundImage = playlistInfo.thumb ? "url('" + playlistInfo.thumb + "')" : '';
+    els.playlistCover.textContent = (playlistInfo.title || '?').trim().charAt(0).toUpperCase();
     els.playlistName.textContent = playlistInfo.title || '';
     const count = playlistInfo.count != null ? playlistInfo.count : tracks.length;
     const sub = [playlistInfo.author, count + (count === 1 ? ' pjesma' : ' pjesama')].filter(Boolean).join(' · ');
