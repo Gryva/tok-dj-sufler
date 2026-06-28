@@ -250,12 +250,15 @@
 
   let longPressTimer = null;
   let longPressRow = null;
+  let longPressStart = null;
   const LONG_PRESS_MS = 500;
+  const LONG_PRESS_MOVE_TOLERANCE = 12;
 
   function cancelLongPress(){
     if (longPressTimer) clearTimeout(longPressTimer);
     longPressTimer = null;
     longPressRow = null;
+    longPressStart = null;
   }
 
   els.queue.addEventListener('contextmenu', (e) => {
@@ -265,8 +268,8 @@
   els.queue.addEventListener('pointerdown', (e) => {
     const row = e.target.closest('.tok-queue-row');
     if (!row) return;
-    if (e.pointerType === 'touch') e.preventDefault();
     longPressRow = row;
+    longPressStart = { x: e.clientX, y: e.clientY };
     longPressTimer = setTimeout(() => {
       if (!longPressRow) return;
       longPressRow.dataset.longPressed = '1';
@@ -275,9 +278,15 @@
       openSongModal(idx);
       longPressTimer = null;
       longPressRow = null;
+      longPressStart = null;
     }, LONG_PRESS_MS);
   });
-  ['pointerup', 'pointermove', 'pointercancel', 'pointerleave'].forEach(evt => {
+  els.queue.addEventListener('pointermove', (e) => {
+    if (!longPressStart) return;
+    const dx = e.clientX - longPressStart.x, dy = e.clientY - longPressStart.y;
+    if (Math.sqrt(dx * dx + dy * dy) > LONG_PRESS_MOVE_TOLERANCE) cancelLongPress();
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(evt => {
     els.queue.addEventListener(evt, cancelLongPress);
   });
 
