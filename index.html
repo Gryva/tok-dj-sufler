@@ -166,7 +166,7 @@
   .tok-sheet-title { font-family:'Fraunces',serif; font-weight:900; font-size:19px; }
   .tok-order-btn {
     border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
-    width:32px; height:32px; border-radius:50%; background:var(--sheet); color:var(--ink); flex-shrink:0;
+    width:32px; height:32px; border-radius:50%; background:var(--dusk); color:var(--ink); flex-shrink:0;
   }
   .tok-order-btn:active { transform:scale(0.92); }
   .tok-order-btn svg { width:16px; height:16px; }
@@ -178,7 +178,7 @@
     cursor:pointer; text-align:left; border:none; color:var(--ink); font-family:inherit; width:100%;
   }
   .tok-queue-row:active { transform:scale(0.98); }
-  .tok-queue-row.current { background:#4a4038; }
+  .tok-queue-row.current { background:#592f26; }
   .tok-cover--queue { width:44px; height:44px; border-radius:13px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--stage); }
   .tok-queue-meta { flex:1; min-width:0; }
   .tok-queue-title { font-family:'Fraunces',serif; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -492,11 +492,16 @@
     }).join('');
   }
 
+  function scrollQueueToCurrent(){
+    const row = els.queue.querySelector('.tok-queue-row.current');
+    if (row) row.scrollIntoView({ block: 'center' });
+  }
   function openQueue(){
     state.queueOpen = true;
     els.backdrop.classList.add('open');
     els.sheet.classList.add('open');
-    refreshPlaylist();
+    scrollQueueToCurrent();
+    refreshPlaylist().then(scrollQueueToCurrent);
   }
   function closeQueue(){
     state.queueOpen = false;
