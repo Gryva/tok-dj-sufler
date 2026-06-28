@@ -407,6 +407,28 @@
     els.liquidBg.classList.add('pos-' + state.armedDir);
   }
 
+  function layoutLiquidWindows(){
+    if (!els.liquidBg) return;
+    const containerTop = els.dirs.getBoundingClientRect().top;
+    const containerHeight = els.dirs.getBoundingClientRect().height;
+    ['up', 'flow', 'down'].forEach(dir => {
+      const card = els.dirs.querySelector('.tok-dir[data-dir="' + dir + '"]');
+      const win = els.liquidBg.querySelector('.tok-liquid-window[data-dir="' + dir + '"]');
+      if (!card || !win) return;
+      const r = card.getBoundingClientRect();
+      const top = r.top - containerTop;
+      win.style.top = top + 'px';
+      win.style.height = r.height + 'px';
+      const wave = win.querySelector('.tok-liquid-wave');
+      // offset the wave upward by exactly how far this window sits from the
+      // container's top, so the texture lines up continuously across the
+      // gaps between cards (one shared flow, not three independent ones)
+      wave.style.top = (-top) + 'px';
+      wave.style.height = (containerHeight + 200) + 'px';
+    });
+  }
+  window.addEventListener('resize', layoutLiquidWindows);
+
   function renderDirs(){
     currentCandidates = pickCandidates();
     state.armedDir = 'flow';
@@ -422,6 +444,7 @@
       card.classList.toggle('chosen', dir === state.armedDir);
     });
     updateLiquidPosition();
+    requestAnimationFrame(layoutLiquidWindows);
   }
 
   els.dirs.addEventListener('click', (e) => {
