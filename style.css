@@ -106,6 +106,8 @@ html, body { height:100%; margin:0; }
 .tok-dir-track { font-family:'Fraunces',serif; font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .tok-dir-artist { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
 .tok-dir.chosen .tok-dir-artist { color:rgba(255,255,255,0.75); }
+.tok-dir-bpm { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); opacity:0.65; margin-top:2px; }
+.tok-dir.chosen .tok-dir-bpm { color:rgba(255,255,255,0.6); }
 .tok-dir-icon { flex-shrink:0; color:var(--muted); display:flex; }
 .tok-dir-icon svg { width:19px; height:19px; }
 .tok-dir.chosen .tok-dir-icon { color:#fff; }
@@ -178,6 +180,8 @@ html, body { height:100%; margin:0; }
 .tok-queue-title { font-family:'Fraunces',serif; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .tok-queue-artist { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
 .tok-queue-row.current .tok-queue-artist { color:rgba(255,255,255,0.75); }
+.tok-queue-bpm { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); opacity:0.65; flex-shrink:0; }
+.tok-queue-row.current .tok-queue-bpm { color:rgba(255,255,255,0.6); }
 .tok-queue-dur { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); flex-shrink:0; }
 .tok-queue-row.current .tok-queue-dur { color:rgba(255,255,255,0.75); }
 

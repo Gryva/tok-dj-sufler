@@ -195,10 +195,12 @@
   function renderQueue(){
     els.queue.innerHTML = tracks.map((t, i) => {
       const isCurrent = i === currentIndex;
+      const bpm = window.TokEngine ? window.TokEngine.getBPM(t) : null;
       return '<button class="tok-queue-row' + (isCurrent ? ' current' : '') + '" data-idx="' + i + '">' +
         '<div class="tok-cover--queue" style="background-image:url(\'' + t.thumb + '\')"></div>' +
         '<div class="tok-queue-meta"><div class="tok-queue-title">' + t.title + '</div>' +
         '<div class="tok-queue-artist">' + t.artist + '</div></div>' +
+        (bpm ? '<div class="tok-queue-bpm">' + bpm + ' BPM</div>' : '') +
         '<div class="tok-queue-dur">' + fmtTime(t.durationSec) + '</div></button>';
     }).join('');
   }
@@ -247,7 +249,10 @@
       const t = currentCandidates[dir].t;
       card.querySelector('.tok-dir-cover').style.backgroundImage = "url('" + t.thumb + "')";
       card.querySelector('.tok-dir-track').textContent = t.title;
+      const dirBpm = window.TokEngine ? window.TokEngine.getBPM(t) : null;
       card.querySelector('.tok-dir-artist').textContent = t.artist;
+      const dirBpmEl = card.querySelector('.tok-dir-bpm');
+      dirBpmEl.textContent = dirBpm ? dirBpm + ' BPM' : '';
       card.classList.toggle('chosen', dir === state.armedDir);
     });
   }
@@ -385,7 +390,8 @@
     els.vinylImg.src = t.thumb;
     applyVinylColor(t);
     els.title.textContent = t.title;
-    els.artist.textContent = t.artist;
+    const nowBpm = window.TokEngine ? window.TokEngine.getBPM(t) : null;
+    els.artist.textContent = t.artist + (nowBpm ? ' · ' + nowBpm + ' BPM' : '');
     els.status.textContent = '';
     renderQueue();
     renderDirs();

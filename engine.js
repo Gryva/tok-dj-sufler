@@ -204,5 +204,11 @@
     };
   }
 
-  window.TokEngine = { init, getDatabase, saveDatabase, getSuggestions, findSongForTrack };
+  function getBPM(track){
+    const db = getDatabase();
+    const song = findSongForTrack(track, db);
+    return song ? song.bpm : null;
+  }
+
+  window.TokEngine = { init, getDatabase, saveDatabase, getSuggestions, findSongForTrack, getBPM };
 })();
