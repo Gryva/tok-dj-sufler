@@ -78,16 +78,25 @@
     }
   }
 
+  // getDatabase() is called on every queue row / direction-card render, so
+  // the parsed array is cached in memory and only re-read from localStorage
+  // (or re-parsed) when it's actually changed via saveDatabase. Avoids
+  // re-parsing the whole JSON blob on every render as the database grows.
+  let dbCache = null;
+
   function getDatabase(){
+    if (dbCache) return dbCache;
     try {
       const raw = localStorage.getItem(DB_KEY);
-      return raw ? JSON.parse(raw) : DEFAULT_DATABASE.slice();
+      dbCache = raw ? JSON.parse(raw) : DEFAULT_DATABASE.slice();
     } catch (e) {
-      return DEFAULT_DATABASE.slice();
+      dbCache = DEFAULT_DATABASE.slice();
     }
+    return dbCache;
   }
 
   function saveDatabase(db){
+    dbCache = db;
     localStorage.setItem(DB_KEY, JSON.stringify(db));
   }
 

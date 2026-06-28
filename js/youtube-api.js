@@ -1,6 +1,18 @@
 // Pure helpers for talking to the YouTube Data API and shaping its responses
 // into the plain track objects the rest of the app works with.
 
+// Network calls here would otherwise hang forever on a dropped connection
+// (e.g. flaky mobile signal mid-set), blocking bootstrap or a background
+// refresh indefinitely. A timeout lets callers fail fast and keep playing
+// whatever's already loaded instead of freezing the UI.
+const REQUEST_TIMEOUT_MS = 10000;
+
+function fetchWithTimeout(url){
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+
 export function ytThumb(videoId){
   return 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
 }
@@ -38,7 +50,7 @@ export async function fetchPlaylistTracks(apiKey, playlistId){
   do {
     const url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=' +
       playlistId + '&key=' + apiKey + (pageToken ? '&pageToken=' + pageToken : '');
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url);
     const data = await res.json();
     if (!res.ok) throw new Error((data.error && data.error.message) || 'YouTube API greška');
     items = items.concat(data.items || []);
@@ -64,7 +76,7 @@ export async function fetchPlaylistTracks(apiKey, playlistId){
     const batch = result.slice(i, i + 50);
     const ids = batch.map(t => t.id).join(',');
     const url = 'https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=' + ids + '&key=' + apiKey;
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url);
     const data = await res.json();
     (data.items || []).forEach(v => {
       const t = result.find(x => x.id === v.id);
@@ -77,7 +89,7 @@ export async function fetchPlaylistTracks(apiKey, playlistId){
 export async function fetchPlaylistInfo(apiKey, playlistId){
   const url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=' +
     playlistId + '&key=' + apiKey;
-  const res = await fetch(url);
+  const res = await fetchWithTimeout(url);
   const data = await res.json();
   if (!res.ok) throw new Error((data.error && data.error.message) || 'YouTube API greška');
   const item = (data.items || [])[0];
