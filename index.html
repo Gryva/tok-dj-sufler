@@ -79,13 +79,17 @@
     background: repeating-radial-gradient(circle, rgba(0,0,0,0.16) 0px, rgba(0,0,0,0.16) 1.5px, transparent 1.5px, transparent 5px);
   }
   .tok-vinyl-cover {
-    position:absolute; inset:24%; border-radius:50%;
-    background-color: var(--stage); background-size:cover; background-position:center;
+    position:absolute; inset:24%; border-radius:50%; overflow:hidden;
+    background-color: var(--stage);
     box-shadow: 0 0 0 6px var(--bg), inset 0 0 0 2px rgba(255,255,255,0.12);
   }
-  .tok-vinyl-cover::after {
-    content:''; position:absolute; top:50%; left:50%; width:14px; height:14px;
-    background:var(--bg); border-radius:50%; transform:translate(-50%,-50%);
+  .tok-vinyl-cover-img {
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:center; display:block;
+  }
+  .tok-vinyl-hole {
+    position:absolute; top:50%; left:50%; width:14px; height:14px;
+    background:var(--bg); border-radius:50%; transform:translate(-50%,-50%); z-index:1;
   }
   @keyframes tok-spin { to { transform: rotate(360deg); } }
 
@@ -96,7 +100,7 @@
   /* ---------- soundwave progress ---------- */
   .tok-wave { display:flex; align-items:center; gap:3px; margin-top:18px; width:100%; max-width:320px; height:28px; cursor:pointer; }
   .tok-wave-bar { flex:1; min-width:2px; border-radius:3px; background:rgba(255,255,255,0.14); transition: background 0.2s; }
-  .tok-wave-bar.played { background: var(--gold); }
+  .tok-wave-bar.played { background: var(--wave-accent, var(--gold)); }
 
   /* ---------- transport ---------- */
   /* ---------- direction picker ---------- */
@@ -195,7 +199,10 @@
   <div class="tok-main">
     <div class="tok-vinyl-wrap">
       <div class="tok-vinyl" id="tokVinyl">
-        <div class="tok-vinyl-cover" id="tokVinylCover"></div>
+        <div class="tok-vinyl-cover" id="tokVinylCover">
+          <img class="tok-vinyl-cover-img" id="tokVinylImg" alt="">
+          <div class="tok-vinyl-hole"></div>
+        </div>
       </div>
     </div>
 
@@ -273,6 +280,7 @@
     nextBtn: document.getElementById('tokNextBtn'),
     vinyl: document.getElementById('tokVinyl'),
     vinylCover: document.getElementById('tokVinylCover'),
+    vinylImg: document.getElementById('tokVinylImg'),
     title: document.getElementById('tokNowTitle'),
     artist: document.getElementById('tokNowArtist'),
     status: document.getElementById('tokStatus'),
@@ -485,6 +493,7 @@
 
   const colorCache = {};
   const DEFAULT_VINYL_BG = 'conic-gradient(from 0deg, #FF5A3C, #FFC857, #E2401D, #F0883E, #FF5A3C)';
+  const DEFAULT_WAVE_ACCENT = '#FFC857';
 
   function rgbToHsl(r, g, b){
     r /= 255; g /= 255; b /= 255;
@@ -502,9 +511,14 @@
     return { h, s, l };
   }
 
+  function setVinylAccent(c){
+    els.vinyl.style.background = c.bg;
+    document.querySelector('.tok-app').style.setProperty('--wave-accent', c.accent);
+  }
+
   function applyVinylColor(t){
-    if (colorCache[t.id]) { els.vinyl.style.background = colorCache[t.id]; return; }
-    els.vinyl.style.background = DEFAULT_VINYL_BG;
+    if (colorCache[t.id]) { setVinylAccent(colorCache[t.id]); return; }
+    setVinylAccent({ bg: DEFAULT_VINYL_BG, accent: DEFAULT_WAVE_ACCENT });
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
@@ -517,9 +531,13 @@
         let r = 0, g = 0, b = 0, n = 0;
         for (let i = 0; i < data.length; i += 4) { r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
         const hsl = rgbToHsl(r / n, g / n, b / n);
-        const bg = 'conic-gradient(from 0deg, hsl(' + hsl.h.toFixed(0) + ',80%,50%), hsl(' + hsl.h.toFixed(0) + ',85%,68%), hsl(' + hsl.h.toFixed(0) + ',80%,50%), hsl(' + hsl.h.toFixed(0) + ',85%,68%), hsl(' + hsl.h.toFixed(0) + ',80%,50%))';
-        colorCache[t.id] = bg;
-        if (tracks[currentIndex] === t) els.vinyl.style.background = bg;
+        const hue = hsl.h.toFixed(0);
+        const c = {
+          bg: 'conic-gradient(from 0deg, hsl(' + hue + ',80%,50%), hsl(' + hue + ',85%,68%), hsl(' + hue + ',80%,50%), hsl(' + hue + ',85%,68%), hsl(' + hue + ',80%,50%))',
+          accent: 'hsl(' + hue + ',85%,60%)'
+        };
+        colorCache[t.id] = c;
+        if (tracks[currentIndex] === t) setVinylAccent(c);
       } catch (e) { /* tainted canvas (no CORS on thumbnail) — keep default */ }
     };
     img.src = t.thumb;
@@ -527,7 +545,7 @@
 
   function loadCurrentTrack(autoplay){
     const t = tracks[currentIndex];
-    els.vinylCover.style.backgroundImage = "url('" + t.thumb + "')";
+    els.vinylImg.src = t.thumb;
     applyVinylColor(t);
     els.title.textContent = t.title;
     els.artist.textContent = t.artist;
