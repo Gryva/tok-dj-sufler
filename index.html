@@ -51,6 +51,8 @@
   .tok-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; }
   .tok-wordmark { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:24px; letter-spacing:0.5px; }
   .tok-sub { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; }
+  .tok-openplaylist-btn { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; color:var(--dusk); background:rgba(232,189,107,0.12); border:1px solid rgba(232,189,107,0.35); border-radius:999px; padding:8px 14px; text-decoration:none; white-space:nowrap; }
+  .tok-openplaylist-btn:active { background:rgba(232,189,107,0.22); }
 
   .tok-stage {
     position: relative;
@@ -216,6 +218,7 @@
       <div class="tok-wordmark">TOK</div>
       <div class="tok-sub">dj sufler · demo</div>
     </div>
+    <a class="tok-openplaylist-btn" id="tokOpenPlaylist" href="#">▶ otvori playlistu</a>
   </div>
 
   <div class="tok-stage">
@@ -335,7 +338,8 @@
     secs: document.getElementById('tokSecs'),
     ring: document.getElementById('tokRing'),
     options: document.getElementById('tokOptions'),
-    openInApp: document.getElementById('tokOpenInApp')
+    openInApp: document.getElementById('tokOpenInApp'),
+    openPlaylist: document.getElementById('tokOpenPlaylist')
   };
 
   const CIRC = 2 * Math.PI * 86;
@@ -347,8 +351,8 @@
   }
 
   const isAndroid = /Android/i.test(navigator.userAgent);
-  function ytMusicAppLink(videoId){
-    const target = 'music.youtube.com/watch?v=' + videoId;
+  function ytMusicAppLink(path){
+    const target = 'music.youtube.com' + path;
     if (!isAndroid) return 'https://' + target;
     const fallback = encodeURIComponent('https://' + target);
     return 'intent://' + target + '#Intent;scheme=https;package=app.revanced.android.apps.youtube.music;S.browser_fallback_url=' + fallback + ';end';
@@ -478,7 +482,7 @@
     els.recapCover = document.getElementById('tokRecapCover');
     els.recapTitle.textContent = t.title;
     els.recapArtist.textContent = t.artist;
-    els.openInApp.href = ytMusicAppLink(t.id);
+    els.openInApp.href = ytMusicAppLink('/watch?v=' + t.id);
 
     currentCandidates = pickCandidates();
     state.armedDir = 'stay';
@@ -592,6 +596,8 @@
       openSheet();
     }
   }, 250);
+
+  els.openPlaylist.href = ytMusicAppLink('/playlist?list=' + PLAYLIST_ID);
 
   (async function bootstrap(){
     try {
