@@ -621,11 +621,23 @@
     }, stepMs);
   }
 
+  function cancelCrossfade(){
+    if (crossfadeInterval) { clearInterval(crossfadeInterval); crossfadeInterval = null; }
+    if (!crossfadeActive) return;
+    crossfadeActive = false;
+    // the in-flight tween was ramping inactivePlayer up and player down —
+    // snap both back to full volume so neither is left silently muted,
+    // and leave `player`/`inactivePlayer` exactly as they are right now
+    // (no swap) since the caller is about to hard-load a track into `player`.
+    try { player.setVolume(100); } catch (e) {}
+    try { inactivePlayer.setVolume(100); inactivePlayer.pauseVideo(); } catch (e) {}
+  }
+
   function switchTrack(idx, autoplay, allowCrossfade){
     const canCrossfade = allowCrossfade !== false && state.crossfade && autoplay && state.playing &&
       playerBReady && player && inactivePlayer && !crossfadeActive;
     if (canCrossfade) crossfadeToTrack(idx);
-    else { currentIndex = idx; loadCurrentTrack(autoplay); }
+    else { cancelCrossfade(); currentIndex = idx; loadCurrentTrack(autoplay); }
   }
 
   function jumpToTrack(idx, autoplay){
