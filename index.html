@@ -140,13 +140,6 @@
   .tok-playbtn { width:50px; height:50px; border-radius:50%; background:var(--dusk); color:var(--ink); font-size:18px; }
   .tok-playbtn:active { transform:scale(0.94); }
 
-  .tok-queue-toggle {
-    border:none; cursor:pointer; font-family:'Fraunces',serif; font-weight:700; font-size:13.5px;
-    color:var(--ink); background:var(--stage); border-radius:999px; padding:10px 20px;
-    display:flex; align-items:center; gap:6px;
-  }
-  .tok-queue-toggle:active { transform:scale(0.97); }
-
   /* ---------- queue sheet ---------- */
   .tok-backdrop {
     position:fixed; inset:0;
@@ -198,6 +191,7 @@
   <div class="tok-head">
     <div class="tok-wordmark">TOK</div>
     <div class="tok-head-actions">
+      <button class="tok-yt-link" id="tokQueueToggle" aria-label="Otvori queue">☰</button>
       <button class="tok-yt-link" id="tokChangePlaylist" aria-label="Promijeni playlistu">⇄</button>
     </div>
   </div>
@@ -264,8 +258,6 @@
         </div>
       </button>
     </div>
-
-    <button class="tok-queue-toggle" id="tokQueueToggle">Queue ▾</button>
   </div>
 
   <div id="ytPlayer" style="position:absolute; width:1px; height:1px; opacity:0.01; pointer-events:none; overflow:hidden;"></div>
