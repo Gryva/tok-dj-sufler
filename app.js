@@ -1,0 +1,494 @@
+(function(){
+  const YT_API_KEY = 'AIzaSyCkZpbb-oVsH_s2Yjn5AAql3Pfke0MExTA';
+  const DEFAULT_PLAYLIST_ID = 'PL9qqRdUh4PoNhlUS4g69SQTxteQKHVAe-';
+  let PLAYLIST_ID = localStorage.getItem('tok_playlist_id') || DEFAULT_PLAYLIST_ID;
+
+  let tracks = [];
+  let currentIndex = 0;
+  let player = null;
+  let currentCandidates = null;
+  let history = [];
+
+  const state = { playing:false, queueOpen:false, armedDir:'flow', order: localStorage.getItem('tok_order') || 'sequential' };
+
+  const els = {
+    playBtn: document.getElementById('tokPlayBtn'),
+    prevBtn: document.getElementById('tokPrevBtn'),
+    nextBtn: document.getElementById('tokNextBtn'),
+    vinyl: document.getElementById('tokVinyl'),
+    vinylCover: document.getElementById('tokVinylCover'),
+    vinylImg: document.getElementById('tokVinylImg'),
+    title: document.getElementById('tokNowTitle'),
+    artist: document.getElementById('tokNowArtist'),
+    status: document.getElementById('tokStatus'),
+    wave: document.getElementById('tokWave'),
+    queueToggle: document.getElementById('tokQueueToggle'),
+    backdrop: document.getElementById('tokBackdrop'),
+    sheet: document.getElementById('tokSheet'),
+    handle: document.getElementById('tokHandle'),
+    queue: document.getElementById('tokQueue'),
+    dirs: document.getElementById('tokDirs'),
+    changePlaylist: document.getElementById('tokChangePlaylist'),
+    playlistBackdrop: document.getElementById('tokPlaylistBackdrop'),
+    playlistInput: document.getElementById('tokPlaylistInput'),
+    playlistError: document.getElementById('tokPlaylistError'),
+    playlistCancel: document.getElementById('tokPlaylistCancel'),
+    playlistSave: document.getElementById('tokPlaylistSave'),
+    orderToggle: document.getElementById('tokOrderToggle'),
+    orderIcon: document.getElementById('tokOrderIcon')
+  };
+
+  const WAVE_BARS = 40;
+  function buildWave(){
+    let html = '';
+    for (let i = 0; i < WAVE_BARS; i++) {
+      const h = 25 + Math.round(Math.sin(i * 1.3) * 20 + Math.sin(i * 0.4) * 30 + 30);
+      html += '<div class="tok-wave-bar" style="height:' + Math.max(15, Math.min(100, h)) + '%"></div>';
+    }
+    els.wave.innerHTML = html;
+  }
+  function updateWaveProgress(pct){
+    const bars = els.wave.children;
+    const cutoff = Math.round((pct / 100) * bars.length);
+    for (let i = 0; i < bars.length; i++) {
+      bars[i].classList.toggle('played', i < cutoff);
+    }
+  }
+
+  els.wave.addEventListener('click', (e) => {
+    if (!player || typeof player.seekTo !== 'function') return;
+    const rect = els.wave.getBoundingClientRect();
+    const pct = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    const dur = player.getDuration() || tracks[currentIndex].durationSec || 0;
+    if (!dur) return;
+    player.seekTo(dur * pct, true);
+    updateWaveProgress(pct * 100);
+  });
+
+  function ytThumb(videoId){
+    return 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
+  }
+
+  function parseTitleArtist(snippetTitle, channelTitle){
+    let artist = (channelTitle || '').replace(/\s*-\s*Topic$/i, '').trim();
+    let title = snippetTitle;
+    const m = snippetTitle.match(/^(.*?)\s*[-–]\s*(.*)$/);
+    if (m && m[1] && m[2]) { artist = m[1].trim(); title = m[2].trim(); }
+    return { title, artist: artist || 'Nepoznat izvođač' };
+  }
+
+  function parseISODuration(iso){
+    const m = (iso || '').match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!m) return 0;
+    return (parseInt(m[1] || 0, 10) * 3600) + (parseInt(m[2] || 0, 10) * 60) + parseInt(m[3] || 0, 10);
+  }
+
+  function fmtTime(s){
+    s = Math.max(0, Math.round(s || 0));
+    const m = Math.floor(s / 60), sec = s % 60;
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  async function fetchPlaylistTracks(){
+    let items = [];
+    let pageToken = '';
+    do {
+      const url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=' +
+        PLAYLIST_ID + '&key=' + YT_API_KEY + (pageToken ? '&pageToken=' + pageToken : '');
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error((data.error && data.error.message) || 'YouTube API greška');
+      items = items.concat(data.items || []);
+      pageToken = data.nextPageToken || '';
+    } while (pageToken && items.length < 200);
+
+    const seenIds = new Set();
+    const result = items
+      .filter(it => it.snippet && it.snippet.resourceId && it.snippet.resourceId.videoId &&
+        it.snippet.title !== 'Deleted video' && it.snippet.title !== 'Private video')
+      .map(it => {
+        const vid = it.snippet.resourceId.videoId;
+        const parsed = parseTitleArtist(it.snippet.title, it.snippet.videoOwnerChannelTitle);
+        return { id: vid, title: parsed.title, artist: parsed.artist, thumb: ytThumb(vid), durationSec: 0 };
+      })
+      .filter(t => {
+        if (seenIds.has(t.id)) return false;
+        seenIds.add(t.id);
+        return true;
+      });
+
+    for (let i = 0; i < result.length; i += 50) {
+      const batch = result.slice(i, i + 50);
+      const ids = batch.map(t => t.id).join(',');
+      const url = 'https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=' + ids + '&key=' + YT_API_KEY;
+      const res = await fetch(url);
+      const data = await res.json();
+      (data.items || []).forEach(v => {
+        const t = result.find(x => x.id === v.id);
+        if (t) t.durationSec = parseISODuration(v.contentDetails.duration);
+      });
+    }
+    return result;
+  }
+
+  async function fetchPlaylist(){
+    tracks = await fetchPlaylistTracks();
+  }
+
+  async function refreshPlaylist(){
+    let fresh;
+    try {
+      fresh = await fetchPlaylistTracks();
+    } catch (err) {
+      return;
+    }
+    if (!fresh.length) return;
+
+    const currentTrack = tracks[currentIndex];
+    tracks = fresh;
+
+    if (currentTrack) {
+      const newIdx = tracks.findIndex(t => t.id === currentTrack.id);
+      if (newIdx !== -1) currentIndex = newIdx;
+    }
+
+    renderQueue();
+  }
+
+  function renderQueue(){
+    els.queue.innerHTML = tracks.map((t, i) => {
+      const isCurrent = i === currentIndex;
+      return '<button class="tok-queue-row' + (isCurrent ? ' current' : '') + '" data-idx="' + i + '">' +
+        '<div class="tok-cover--queue" style="background-image:url(\'' + t.thumb + '\')"></div>' +
+        '<div class="tok-queue-meta"><div class="tok-queue-title">' + t.title + '</div>' +
+        '<div class="tok-queue-artist">' + t.artist + '</div></div>' +
+        '<div class="tok-queue-dur">' + fmtTime(t.durationSec) + '</div></button>';
+    }).join('');
+  }
+
+  function scrollQueueToCurrent(){
+    const row = els.queue.querySelector('.tok-queue-row.current');
+    if (row) row.scrollIntoView({ block: 'center' });
+  }
+  function openQueue(){
+    state.queueOpen = true;
+    els.backdrop.classList.add('open');
+    els.sheet.classList.add('open');
+    scrollQueueToCurrent();
+    refreshPlaylist().then(scrollQueueToCurrent);
+  }
+  function closeQueue(){
+    state.queueOpen = false;
+    els.backdrop.classList.remove('open');
+    els.sheet.classList.remove('open');
+  }
+
+  els.queueToggle.addEventListener('click', () => state.queueOpen ? closeQueue() : openQueue());
+  els.backdrop.addEventListener('click', closeQueue);
+  els.handle.addEventListener('click', closeQueue);
+  els.queue.addEventListener('click', (e) => {
+    const row = e.target.closest('.tok-queue-row');
+    if (!row) return;
+    const idx = parseInt(row.getAttribute('data-idx'), 10);
+    closeQueue();
+    if (idx !== currentIndex) jumpToTrack(idx, true);
+  });
+
+  function pickCandidates(){
+    const n = tracks.length;
+    let flowIdx;
+    if (state.order === 'shuffle') {
+      const recent = new Set(history.slice(-3).map(t => t.id).concat([tracks[currentIndex].id]));
+      const opts = tracks.map((t, idx) => idx).filter(idx => !recent.has(tracks[idx].id));
+      const pool = opts.length ? opts : tracks.map((t, idx) => idx).filter(idx => idx !== currentIndex);
+      flowIdx = pool[Math.floor(Math.random() * pool.length)];
+    } else {
+      flowIdx = (currentIndex + 1) % n;
+    }
+    const used = new Set(history.slice(-3).map(t => t.id).concat([tracks[currentIndex].id, tracks[flowIdx].id]));
+    function pickRandom(exclude){
+      const opts = tracks
+        .map((t, idx) => ({ t, idx }))
+        .filter(({ t }) => !used.has(t.id) && !exclude.has(t.id));
+      const pool = opts.length ? opts : tracks
+        .map((t, idx) => ({ t, idx }))
+        .filter(({ idx }) => idx !== currentIndex);
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+    const up = pickRandom(new Set());
+    const down = pickRandom(new Set([up.t.id]));
+    return {
+      up: { t: up.t, idx: up.idx },
+      flow: { t: tracks[flowIdx], idx: flowIdx },
+      down: { t: down.t, idx: down.idx }
+    };
+  }
+
+  function renderDirs(){
+    currentCandidates = pickCandidates();
+    state.armedDir = 'flow';
+    ['up','flow','down'].forEach(dir => {
+      const card = els.dirs.querySelector('[data-dir="' + dir + '"]');
+      const t = currentCandidates[dir].t;
+      card.querySelector('.tok-dir-cover').style.backgroundImage = "url('" + t.thumb + "')";
+      card.querySelector('.tok-dir-track').textContent = t.title;
+      card.querySelector('.tok-dir-artist').textContent = t.artist;
+      card.classList.toggle('chosen', dir === state.armedDir);
+    });
+  }
+
+  els.dirs.addEventListener('click', (e) => {
+    const card = e.target.closest('.tok-dir');
+    if (!card) return;
+    state.armedDir = card.getAttribute('data-dir');
+    els.dirs.querySelectorAll('.tok-dir').forEach(c => c.classList.toggle('chosen', c === card));
+  });
+
+  const ORDER_ICONS = {
+    sequential: '<polyline points="9 6 15 12 9 18"></polyline>',
+    shuffle: '<polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line>'
+  };
+  function setOrder(order){
+    state.order = order;
+    localStorage.setItem('tok_order', order);
+    els.orderIcon.innerHTML = ORDER_ICONS[order];
+    if (tracks.length) renderDirs();
+  }
+  els.orderToggle.addEventListener('click', () => {
+    setOrder(state.order === 'sequential' ? 'shuffle' : 'sequential');
+  });
+  setOrder(state.order);
+
+  function commitEndOfSong(){
+    const picked = currentCandidates[state.armedDir];
+    history.push(tracks[currentIndex]);
+    currentIndex = picked.idx;
+    loadCurrentTrack(true);
+  }
+
+  function updateMediaSession(t){
+    if (!('mediaSession' in navigator)) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: t.title, artist: t.artist, album: 'YouTube Music',
+      artwork: [{ src: t.thumb, sizes: '480x360', type: 'image/jpeg' }]
+    });
+  }
+
+  function extractPlaylistId(input){
+    const m = input.match(/[?&]list=([a-zA-Z0-9_-]+)/);
+    if (m) return m[1];
+    if (/^[a-zA-Z0-9_-]{10,}$/.test(input)) return input;
+    return null;
+  }
+
+  function openPlaylistModal(){
+    els.playlistInput.value = PLAYLIST_ID;
+    els.playlistError.textContent = '';
+    els.playlistBackdrop.classList.add('open');
+    els.playlistInput.focus();
+  }
+  function closePlaylistModal(){
+    els.playlistBackdrop.classList.remove('open');
+  }
+  function savePlaylist(){
+    const input = els.playlistInput.value.trim();
+    if (!input) { closePlaylistModal(); return; }
+    const id = extractPlaylistId(input);
+    if (!id) { els.playlistError.textContent = 'Nisam prepoznao playlist ID.'; return; }
+    localStorage.setItem('tok_playlist_id', id);
+    location.reload();
+  }
+
+  els.changePlaylist.addEventListener('click', openPlaylistModal);
+  els.playlistCancel.addEventListener('click', closePlaylistModal);
+  els.playlistBackdrop.addEventListener('click', (e) => {
+    if (e.target === els.playlistBackdrop) closePlaylistModal();
+  });
+  els.playlistSave.addEventListener('click', savePlaylist);
+  els.playlistInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') savePlaylist();
+  });
+
+  const colorCache = {};
+  const DEFAULT_VINYL_BG = 'conic-gradient(from 0deg, #FF5A3C, #FFC857, #E2401D, #F0883E, #FF5A3C)';
+  const DEFAULT_WAVE_ACCENT = '#FFC857';
+
+  function rgbToHsl(r, g, b){
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) { h = s = 0; }
+    else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r) h = ((g - b) / d) + (g < b ? 6 : 0);
+      else if (max === g) h = ((b - r) / d) + 2;
+      else h = ((r - g) / d) + 4;
+      h *= 60;
+    }
+    return { h, s, l };
+  }
+
+  function setVinylAccent(c){
+    document.querySelector('.tok-app').style.setProperty('--vinyl-color', c.bg);
+    document.querySelector('.tok-app').style.setProperty('--wave-accent', c.accent);
+  }
+
+  function applyVinylColor(t){
+    if (colorCache[t.id]) { setVinylAccent(colorCache[t.id]); return; }
+    setVinylAccent({ bg: DEFAULT_VINYL_BG, accent: DEFAULT_WAVE_ACCENT });
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 16; canvas.height = 16;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 16, 16);
+        const data = ctx.getImageData(0, 0, 16, 16).data;
+        let r = 0, g = 0, b = 0, n = 0;
+        for (let i = 0; i < data.length; i += 4) { r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
+        const hsl = rgbToHsl(r / n, g / n, b / n);
+        const hue = hsl.h.toFixed(0);
+        const c = {
+          bg: 'conic-gradient(from 0deg, hsl(' + hue + ',80%,50%), hsl(' + hue + ',85%,68%), hsl(' + hue + ',80%,50%), hsl(' + hue + ',85%,68%), hsl(' + hue + ',80%,50%))',
+          accent: 'hsl(' + hue + ',85%,60%)'
+        };
+        colorCache[t.id] = c;
+        if (tracks[currentIndex] === t) setVinylAccent(c);
+      } catch (e) { /* tainted canvas (no CORS on thumbnail) — keep default */ }
+    };
+    img.src = t.thumb;
+  }
+
+  function loadCurrentTrack(autoplay){
+    const t = tracks[currentIndex];
+    localStorage.setItem('tok_last_track_id', t.id);
+    els.vinylImg.src = t.thumb;
+    applyVinylColor(t);
+    els.title.textContent = t.title;
+    els.artist.textContent = t.artist;
+    els.status.textContent = '';
+    renderQueue();
+    renderDirs();
+    updateMediaSession(t);
+
+    if (player && typeof player.loadVideoById === 'function') {
+      localStorage.setItem('tok_last_pos', '0');
+      if (autoplay) player.loadVideoById(t.id);
+      else player.cueVideoById(t.id);
+    }
+  }
+
+  function jumpToTrack(idx, autoplay){
+    currentIndex = idx;
+    loadCurrentTrack(autoplay);
+  }
+
+  els.prevBtn.addEventListener('click', () => {
+    if (history.length) {
+      const prevTrack = history.pop();
+      currentIndex = tracks.findIndex(t => t.id === prevTrack.id);
+      loadCurrentTrack(true);
+    } else {
+      jumpToTrack((currentIndex - 1 + tracks.length) % tracks.length, true);
+    }
+  });
+  els.nextBtn.addEventListener('click', () => {
+    commitEndOfSong();
+  });
+  els.playBtn.addEventListener('click', () => {
+    if (!player || typeof player.getPlayerState !== 'function') return;
+    if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo();
+    else player.playVideo();
+  });
+
+  function savePosition(){
+    if (!player || typeof player.getCurrentTime !== 'function') return;
+    localStorage.setItem('tok_last_pos', String(player.getCurrentTime() || 0));
+  }
+
+  function onPlayerStateChange(e){
+    if (e.data === YT.PlayerState.PLAYING) {
+      state.playing = true;
+      els.playBtn.textContent = '❙❙';
+      els.vinylCover.classList.add('spinning');
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+      localStorage.setItem('tok_was_playing', '1');
+    } else if (e.data === YT.PlayerState.PAUSED) {
+      state.playing = false;
+      els.playBtn.textContent = '▶';
+      els.vinylCover.classList.remove('spinning');
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+      localStorage.setItem('tok_was_playing', '0');
+      savePosition();
+    } else if (e.data === YT.PlayerState.ENDED) {
+      localStorage.setItem('tok_last_pos', '0');
+      commitEndOfSong();
+    }
+  }
+
+  function onPlayerReady(){
+    const pos = parseFloat(localStorage.getItem('tok_last_pos') || '0');
+    const wasPlaying = localStorage.getItem('tok_was_playing') === '1';
+    if (pos > 0) player.seekTo(pos, true);
+    if (wasPlaying) player.playVideo();
+    else player.pauseVideo();
+  }
+
+  window.onYouTubeIframeAPIReady = function(){
+    player = new YT.Player('ytPlayer', {
+      height: '1', width: '1',
+      videoId: tracks[currentIndex].id,
+      playerVars: { autoplay:0, controls:0, disablekb:1, modestbranding:1, rel:0, playsinline:1 },
+      events: { onReady: onPlayerReady, onStateChange: onPlayerStateChange }
+    });
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', () => player.playVideo());
+      navigator.mediaSession.setActionHandler('pause', () => player.pauseVideo());
+      navigator.mediaSession.setActionHandler('previoustrack', () => els.prevBtn.click());
+      navigator.mediaSession.setActionHandler('nexttrack', () => els.nextBtn.click());
+    }
+  };
+
+  let posSaveCounter = 0;
+  setInterval(() => {
+    if (!player || typeof player.getCurrentTime !== 'function' || !state.playing) return;
+    const cur = player.getCurrentTime();
+    const dur = player.getDuration() || tracks[currentIndex].durationSec || 0;
+    if (!dur) return;
+    updateWaveProgress(Math.min(100, (cur / dur) * 100));
+    posSaveCounter++;
+    if (posSaveCounter % 8 === 0) localStorage.setItem('tok_last_pos', String(cur));
+  }, 250);
+
+  window.addEventListener('beforeunload', savePosition);
+
+  setInterval(() => {
+    if (tracks.length) refreshPlaylist();
+  }, 30000);
+
+  (async function bootstrap(){
+    try {
+      await fetchPlaylist();
+    } catch (err) {
+      els.title.textContent = 'Greška kod dohvata playliste';
+      els.artist.textContent = String((err && err.message) || err);
+      return;
+    }
+    if (!tracks.length) {
+      els.title.textContent = 'Playlist je prazna ili nije javno dostupna';
+      return;
+    }
+    buildWave();
+    const lastId = localStorage.getItem('tok_last_track_id');
+    const lastIdx = lastId ? tracks.findIndex(t => t.id === lastId) : -1;
+    currentIndex = lastIdx !== -1 ? lastIdx : Math.floor(Math.random() * tracks.length);
+    els.status.textContent = 'pritisni ▶ za reprodukciju';
+    loadCurrentTrack(false);
+
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+  })();
+})();

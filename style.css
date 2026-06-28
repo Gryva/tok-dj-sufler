@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+html, body { height:100%; margin:0; }
+
+.tok-app {
+  --bg: #16100E;
+  --stage: #241914;
+  --sheet: #2E1F19;
+  --ink: #FBF1E7;
+  --muted: #C9A99A;
+  --ember: #FF5A3C;
+  --dusk: #E2401D;
+  --tide: #F0883E;
+  --gold: #FFC857;
+  font-family: 'Manrope', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  width: 100%;
+  min-height: 100dvh;
+  padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.tok-app * { box-sizing: border-box; }
+
+.tok-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.tok-wordmark { font-family:'Fraunces',serif; font-weight:900; font-size:24px; letter-spacing:0.2px; }
+.tok-head-actions { display:flex; align-items:center; gap:8px; }
+.tok-yt-link {
+  display:flex; align-items:center; justify-content:center;
+  width:34px; height:34px; border-radius:50%; border:none;
+  background: var(--dusk); color:var(--ink); text-decoration:none; font-size:13px; cursor:pointer;
+  font-family:inherit;
+}
+
+.tok-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 8px 0;
+}
+
+/* ---------- vinyl ---------- */
+.tok-vinyl-wrap { position:relative; width: min(48vw, 210px); aspect-ratio: 1; flex-shrink: 0; }
+
+/* cover art sits behind the ring and spins on its own */
+.tok-vinyl-cover {
+  position:absolute; inset: 18%; border-radius:50%; overflow:hidden;
+  background-color: var(--stage); z-index:1;
+  animation: tok-spin 7s linear infinite;
+  animation-play-state: paused;
+}
+.tok-vinyl-cover.spinning { animation-play-state: running; }
+.tok-vinyl-cover-img {
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; object-position:center; display:block;
+}
+
+/* the ring is static (grooves are concentric circles, so spinning it is invisible
+   anyway) and has a real transparent hole punched via mask so the cover behind
+   it shows through completely, with no clip-under-transform browser bugs */
+.tok-vinyl {
+  position:absolute; inset:0; border-radius:50%; z-index:2; pointer-events:none;
+  background:
+    repeating-radial-gradient(circle farthest-side, rgba(0,0,0,0.45) 0px, rgba(0,0,0,0.45) 1px, rgba(255,255,255,0.14) 1px, rgba(255,255,255,0.14) 2px, transparent 2px, transparent 6px),
+    var(--vinyl-color, conic-gradient(from 0deg, #FF5A3C, #FFC857, #E2401D, #F0883E, #FF5A3C));
+  box-shadow: 0 22px 50px rgba(0,0,0,0.55);
+  -webkit-mask-image: radial-gradient(circle farthest-side, transparent 0 31%, black 33% 100%);
+  mask-image: radial-gradient(circle farthest-side, transparent 0 31%, black 33% 100%);
+}
+.tok-vinyl-hole {
+  position:absolute; top:50%; left:50%; width:14px; height:14px;
+  background:var(--bg); border-radius:50%; transform:translate(-50%,-50%); z-index:3;
+}
+@keyframes tok-spin { to { transform: rotate(360deg); } }
+
+
+.tok-nowmeta { text-align:center; width:100%; max-width: 420px; }
+.tok-now-title { font-family:'Fraunces',serif; font-weight:700; font-size:19px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tok-now-artist { color:var(--muted); font-size:13.5px; margin-top:4px; }
+
+/* ---------- soundwave progress ---------- */
+.tok-wave { display:flex; align-items:center; gap:3px; margin-top:8px; width:100%; max-width:320px; height:24px; cursor:pointer; }
+.tok-wave-bar { flex:1; min-width:2px; border-radius:3px; background:rgba(255,255,255,0.14); transition: background 0.2s; }
+.tok-wave-bar.played { background: var(--wave-accent, var(--gold)); }
+
+/* ---------- transport ---------- */
+/* ---------- direction picker ---------- */
+.tok-dirs { display:flex; flex-direction:column; gap:10px; width:100%; max-width:420px; margin-top:10px; }
+.tok-dir {
+  border:none; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
+  background: var(--stage); border-radius:16px; padding:10px 14px; display:flex; align-items:center; gap:12px;
+  opacity:0.55; transition: opacity 0.2s, background 0.2s, transform 0.2s;
+}
+.tok-dir:active { transform:scale(0.98); }
+.tok-dir.chosen { opacity:1; background:var(--dusk); }
+.tok-dir-cover { width:40px; height:40px; border-radius:12px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--sheet); }
+.tok-dir-meta { flex:1; min-width:0; }
+.tok-dir-track { font-family:'Fraunces',serif; font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tok-dir-artist { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+.tok-dir.chosen .tok-dir-artist { color:rgba(255,255,255,0.75); }
+.tok-dir-icon { flex-shrink:0; color:var(--muted); display:flex; }
+.tok-dir-icon svg { width:19px; height:19px; }
+.tok-dir.chosen .tok-dir-icon { color:#fff; }
+
+.tok-transport {
+  display:flex; align-items:center; justify-content:center; gap:16px;
+  background: transparent; border-radius:999px; padding:9px 16px; margin-top:4px;
+}
+.tok-transport button {
+  border:none; cursor:pointer; color:var(--bg); font-family:inherit;
+  display:flex; align-items:center; justify-content:center; background:transparent;
+}
+.tok-transport .tok-skipbtn { width:38px; height:38px; border-radius:50%; font-size:15px; color: var(--dusk); background:transparent; }
+.tok-skipbtn:active { transform:scale(0.92); }
+.tok-transport .tok-playbtn { width:50px; height:50px; border-radius:50%; background:transparent; color: var(--dusk); font-size:18px; }
+.tok-playbtn:active { transform:scale(0.94); }
+
+/* ---------- queue sheet ---------- */
+.tok-backdrop {
+  position:fixed; inset:0;
+  background: rgba(6,4,12,0.6);
+  opacity:0; pointer-events:none;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+.tok-backdrop.open { opacity:1; pointer-events:auto; }
+
+.tok-sheet {
+  position:fixed; left:0; right:0; bottom:0; top:18%;
+  background: var(--stage);
+  border-radius: 28px 28px 0 0;
+  transform: translateY(102%);
+  transition: transform 0.4s cubic-bezier(.22,1,.36,1);
+  z-index: 6;
+  padding: 14px 16px max(16px, env(safe-area-inset-bottom));
+  display:flex; flex-direction:column;
+}
+.tok-sheet.open { transform: translateY(0); }
+.tok-sheet-handle { width:36px; height:4px; border-radius:3px; background:rgba(255,255,255,0.2); margin:0 auto 12px; cursor:pointer; flex-shrink:0; }
+.tok-sheet-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; flex-shrink:0; }
+.tok-sheet-title { font-family:'Fraunces',serif; font-weight:900; font-size:19px; }
+.tok-order-btn {
+  border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  width:32px; height:32px; border-radius:50%; background:var(--dusk); color:var(--ink); flex-shrink:0;
+}
+.tok-order-btn:active { transform:scale(0.92); }
+.tok-order-btn svg { width:16px; height:16px; }
+
+.tok-queue { display:flex; flex-direction:column; gap:8px; overflow-y:auto; flex:1; min-height:0; }
+.tok-queue-row {
+  display:flex; align-items:center; gap:12px;
+  background:var(--sheet); border-radius:18px; padding:9px 12px;
+  cursor:pointer; text-align:left; border:none; color:var(--ink); font-family:inherit; width:100%;
+}
+.tok-queue-row:active { transform:scale(0.98); }
+.tok-queue-row.current { background:#592f26; }
+.tok-cover--queue { width:44px; height:44px; border-radius:13px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--stage); }
+.tok-queue-meta { flex:1; min-width:0; }
+.tok-queue-title { font-family:'Fraunces',serif; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tok-queue-artist { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+.tok-queue-row.current .tok-queue-artist { color:rgba(255,255,255,0.75); }
+.tok-queue-dur { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); flex-shrink:0; }
+.tok-queue-row.current .tok-queue-dur { color:rgba(255,255,255,0.75); }
+
+.tok-status { text-align:center; color:var(--muted); font-size:13px; margin-top:8px; }
+
+/* ---------- playlist modal ---------- */
+.tok-modal-backdrop {
+  position:fixed; inset:0; background:rgba(6,4,12,0.6);
+  opacity:0; pointer-events:none; transition:opacity 0.25s ease; z-index:8;
+  display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.tok-modal-backdrop.open { opacity:1; pointer-events:auto; }
+.tok-modal {
+  background: var(--stage); border-radius:22px; padding:20px; width:100%; max-width:360px;
+  transform: scale(0.94) translateY(-10vh); transition: transform 0.25s ease;
+}
+.tok-modal-backdrop.open .tok-modal { transform: scale(1) translateY(-10vh); }
+.tok-modal-title { font-family:'Fraunces',serif; font-weight:900; font-size:18px; margin-bottom:6px; }
+.tok-modal-text { color:var(--muted); font-size:13px; margin-bottom:14px; line-height:1.4; }
+.tok-modal-input {
+  width:100%; background:var(--sheet); border:1px solid rgba(255,255,255,0.1); border-radius:14px;
+  padding:11px 14px; color:var(--ink); font-family:inherit; font-size:14px; outline:none;
+}
+.tok-modal-input:focus { border-color:var(--dusk); }
+.tok-modal-error { color:var(--dusk); font-size:12px; margin-top:8px; min-height:14px; }
+.tok-modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
+.tok-modal-btn {
+  border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:14px;
+  border-radius:999px; padding:9px 18px; background:transparent; color:var(--muted);
+}
+.tok-modal-btn.primary { background:var(--dusk); color:var(--ink); }
+.tok-modal-btn:active { transform:scale(0.96); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tok-vinyl-cover, .tok-sheet, .tok-backdrop { animation:none !important; transition:none !important; }
+}
