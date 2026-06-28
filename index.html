@@ -98,18 +98,19 @@
 
   /* ---------- transport ---------- */
   /* ---------- direction picker ---------- */
-  .tok-dirs { display:flex; gap:8px; width:100%; max-width:420px; margin-top:14px; }
+  .tok-dirs { display:flex; flex-direction:column; gap:8px; width:100%; max-width:420px; margin-top:14px; }
   .tok-dir {
-    flex:1; border:none; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
-    background: var(--stage); border-radius:18px; padding:10px 10px; display:flex; flex-direction:column; gap:6px;
+    border:none; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
+    background: var(--stage); border-radius:18px; padding:9px 12px; display:flex; align-items:center; gap:12px;
     opacity:0.55; transition: opacity 0.2s, background 0.2s, transform 0.2s;
   }
-  .tok-dir:active { transform:scale(0.96); }
+  .tok-dir:active { transform:scale(0.98); }
   .tok-dir.chosen { opacity:1; background:var(--dusk); }
-  .tok-dir-cover { width:100%; aspect-ratio:1; border-radius:12px; background-size:cover; background-position:center; background-color:var(--sheet); }
-  .tok-dir-label { font-family:'Fraunces',serif; font-weight:700; font-size:11.5px; }
-  .tok-dir-track { font-size:10.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .tok-dir-artist { font-size:9.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tok-dir-cover { width:44px; height:44px; border-radius:13px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--sheet); }
+  .tok-dir-meta { flex:1; min-width:0; }
+  .tok-dir-label { font-family:'Fraunces',serif; font-weight:700; font-size:12px; }
+  .tok-dir-track { font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+  .tok-dir-artist { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .tok-dir.chosen .tok-dir-artist { color:rgba(255,255,255,0.75); }
 
   .tok-transport {
@@ -203,21 +204,27 @@
     <div class="tok-dirs" id="tokDirs">
       <button class="tok-dir" data-dir="up">
         <div class="tok-dir-cover"></div>
-        <div class="tok-dir-label">⬆️ Upper</div>
-        <div class="tok-dir-track"></div>
-        <div class="tok-dir-artist"></div>
+        <div class="tok-dir-meta">
+          <div class="tok-dir-label">🔥 Lift the energy</div>
+          <div class="tok-dir-track"></div>
+          <div class="tok-dir-artist"></div>
+        </div>
       </button>
       <button class="tok-dir" data-dir="flow">
         <div class="tok-dir-cover"></div>
-        <div class="tok-dir-label">🌊 Stay in the flow</div>
-        <div class="tok-dir-track"></div>
-        <div class="tok-dir-artist"></div>
+        <div class="tok-dir-meta">
+          <div class="tok-dir-label">🌊 Stay in the flow</div>
+          <div class="tok-dir-track"></div>
+          <div class="tok-dir-artist"></div>
+        </div>
       </button>
       <button class="tok-dir" data-dir="down">
         <div class="tok-dir-cover"></div>
-        <div class="tok-dir-label">⬇️ Downer</div>
-        <div class="tok-dir-track"></div>
-        <div class="tok-dir-artist"></div>
+        <div class="tok-dir-meta">
+          <div class="tok-dir-label">🌙 Wind it down</div>
+          <div class="tok-dir-track"></div>
+          <div class="tok-dir-artist"></div>
+        </div>
       </button>
     </div>
 
