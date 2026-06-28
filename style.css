@@ -33,8 +33,10 @@ html, body { height:100%; margin:0; }
   display:flex; align-items:center; justify-content:center;
   width:34px; height:34px; border-radius:50%; border:none;
   background: var(--dusk); color:var(--ink); text-decoration:none; font-size:13px; cursor:pointer;
-  font-family:inherit;
+  font-family:inherit; opacity:0.55; transition: opacity 0.2s, background 0.2s;
 }
+.tok-yt-link.active { opacity:1; background:var(--gold); color:var(--bg); }
+#tokQueueToggle, #tokChangePlaylist { opacity:1; }
 
 .tok-main {
   flex: 1;
