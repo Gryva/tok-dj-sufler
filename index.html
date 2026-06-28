@@ -7,167 +7,120 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
-<meta name="theme-color" content="#15101B">
+<meta name="theme-color" content="#16100E">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TOK">
 </head>
-<body style="margin:0; background:#15101B; height:100%;">
+<body style="margin:0; background:#16100E; height:100%;">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap');
 
-  html, body { height:100%; }
+  html, body { height:100%; margin:0; }
 
   .tok-app {
-    --bg: #0E0B1A;
-    --stage: #1B1430;
-    --sheet: #241B3F;
-    --ink: #F6F1FB;
-    --muted: #9C8FBE;
-    --ember: #FF4FA3;
-    --dusk: #8C6CFF;
-    --tide: #22D3EE;
+    --bg: #16100E;
+    --stage: #241914;
+    --sheet: #2E1F19;
+    --ink: #FBF1E7;
+    --muted: #C9A99A;
+    --ember: #FF5A3C;
+    --dusk: #E2401D;
+    --tide: #F0883E;
     --gold: #FFC857;
     font-family: 'Manrope', system-ui, sans-serif;
     background: var(--bg);
     color: var(--ink);
     width: 100%;
-    max-width: 560px;
-    margin: 0 auto;
     min-height: 100dvh;
-    padding: max(18px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow-x: hidden;
   }
   .tok-app * { box-sizing: border-box; }
 
-  @media (min-width: 560px) {
-    .tok-app { border-radius: 32px; min-height: auto; margin: 18px auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
-  }
-
-  /* organic blob backdrop */
-  .tok-blob { position:absolute; border-radius:50%; filter: blur(38px); opacity:0.55; z-index:0; pointer-events:none; }
-  .tok-blob--a { width:220px; height:200px; top:-60px; right:-50px; background:var(--dusk); border-radius:42% 58% 65% 35% / 45% 40% 60% 55%; }
-  .tok-blob--b { width:180px; height:180px; top:140px; left:-70px; background:var(--ember); border-radius:60% 40% 35% 65% / 55% 60% 40% 45%; opacity:0.4; }
-  .tok-blob--c { width:160px; height:160px; bottom:60px; right:-60px; background:var(--tide); border-radius:50% 50% 40% 60% / 60% 40% 60% 40%; opacity:0.35; }
-
-  .tok-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; position:relative; z-index:1; }
-  .tok-wordmark { font-family:'Fraunces',serif; font-weight:900; font-size:26px; letter-spacing:0.2px; }
-  .tok-sub { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; }
+  .tok-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .tok-wordmark { font-family:'Fraunces',serif; font-weight:900; font-size:24px; letter-spacing:0.2px; }
   .tok-yt-link {
     display:flex; align-items:center; justify-content:center;
-    width:32px; height:32px; border-radius:50%;
-    background: var(--sheet); color:var(--ink); text-decoration:none; font-size:13px;
+    width:34px; height:34px; border-radius:50%;
+    background: var(--stage); color:var(--ink); text-decoration:none; font-size:13px;
   }
 
-  .tok-stage {
-    position: relative;
-    z-index: 1;
-    background: var(--stage);
-    border-radius: 28px;
-    padding: 18px;
+  .tok-main {
     flex: 1;
     min-height: 0;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 10px 0 4px;
   }
 
-  /* ---------- compact mini-player (secondary) ---------- */
-  .tok-miniplayer { display:flex; align-items:center; gap:10px; }
-  .tok-cover {
-    position: relative;
-    border-radius: 14px;
-    overflow: hidden;
-    flex-shrink: 0;
-    background-color: var(--sheet);
-    background-size: cover;
-    background-position: center;
+  /* ---------- vinyl ---------- */
+  .tok-vinyl-wrap { width: min(62vw, 270px); aspect-ratio: 1; flex-shrink: 0; }
+  .tok-vinyl {
+    position: relative; width:100%; height:100%; border-radius:50%;
+    background: conic-gradient(from 0deg, #FF5A3C, #FFC857, #E2401D, #F0883E, #FF5A3C);
+    box-shadow: 0 22px 50px rgba(0,0,0,0.55);
+    animation: tok-spin 7s linear infinite;
+    animation-play-state: paused;
   }
-  .tok-cover--mp { width: 52px; height: 52px; border-radius: 14px; }
-  .tok-cover--mini { width: 28px; height: 28px; border-radius: 10px; }
-  .tok-cover--queue { width: 44px; height: 44px; border-radius: 13px; }
-  .tok-cover--card { width: 42px; height: 42px; border-radius: 12px; }
+  .tok-vinyl.spinning { animation-play-state: running; }
+  .tok-vinyl::before {
+    content:''; position:absolute; inset:6%; border-radius:50%;
+    background: repeating-radial-gradient(circle, rgba(0,0,0,0.16) 0px, rgba(0,0,0,0.16) 1.5px, transparent 1.5px, transparent 5px);
+  }
+  .tok-vinyl-cover {
+    position:absolute; inset:30%; border-radius:50%;
+    background-color: var(--stage); background-size:cover; background-position:center;
+    box-shadow: 0 0 0 6px var(--bg), inset 0 0 0 2px rgba(255,255,255,0.12);
+  }
+  .tok-vinyl-cover::after {
+    content:''; position:absolute; top:50%; left:50%; width:14px; height:14px;
+    background:var(--bg); border-radius:50%; transform:translate(-50%,-50%);
+  }
+  @keyframes tok-spin { to { transform: rotate(360deg); } }
 
-  .tok-mp-meta { flex:1; min-width:0; }
-  .tok-eq { display:flex; gap:3px; align-items:flex-end; height:11px; margin-bottom:3px; }
-  .tok-eq span { width:3px; border-radius:2px; background: var(--gold); height:30%; animation: tok-eq-bounce 0.9s ease-in-out infinite; }
-  .tok-eq span:nth-child(2){ animation-delay:0.15s; }
-  .tok-eq span:nth-child(3){ animation-delay:0.3s; }
-  .tok-eq.paused span { animation-play-state: paused; height:25%; }
-  @keyframes tok-eq-bounce { 0%,100%{ height:25%; } 50%{ height:100%; } }
+  .tok-nowmeta { text-align:center; width:100%; max-width: 420px; }
+  .tok-now-title { font-family:'Fraunces',serif; font-weight:700; font-size:21px; line-height:1.25; }
+  .tok-now-artist { color:var(--muted); font-size:14px; margin-top:4px; }
 
-  .tok-now-title { font-family:'Fraunces',serif; font-weight:700; font-size:14.5px; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .tok-now-artist { color:var(--muted); font-size:11.5px; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .tok-now-stats { display:none; }
-
-  .tok-progress-track { height:3px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden; margin-top:6px; }
-  .tok-progress-fill { height:100%; width:0%; background:var(--gold); border-radius:3px; transition: width 0.22s linear, background .3s ease; }
-  .tok-progress-caption { font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); margin-top:3px; }
+  /* ---------- soundwave progress ---------- */
+  .tok-wave { display:flex; align-items:center; gap:3px; margin-top:18px; width:100%; max-width:320px; height:28px; }
+  .tok-wave-bar { flex:1; min-width:2px; border-radius:3px; background:rgba(255,255,255,0.14); transition: background 0.2s; }
+  .tok-wave-bar.played { background: var(--gold); }
 
   /* ---------- transport ---------- */
-  .tok-transport { display:flex; align-items:center; justify-content:center; gap:8px; flex-shrink:0; }
-  .tok-transport button {
-    border:none; cursor:pointer; color:var(--ink); font-family:inherit;
-    display:flex; align-items:center; justify-content:center;
+  .tok-transport {
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    background: var(--ink); border-radius:999px; padding:10px 16px; margin-top:4px;
   }
-  .tok-skipbtn { width:30px; height:30px; border-radius:50%; background:var(--sheet); font-size:12px; }
+  .tok-transport button {
+    border:none; cursor:pointer; color:var(--bg); font-family:inherit;
+    display:flex; align-items:center; justify-content:center; background:transparent;
+  }
+  .tok-skipbtn { width:40px; height:40px; border-radius:50%; font-size:16px; }
   .tok-skipbtn:active { transform:scale(0.92); }
-  .tok-playbtn { width:42px; height:42px; border-radius:50%; background:var(--gold); color:#241B3F; font-size:15px; }
+  .tok-playbtn { width:54px; height:54px; border-radius:50%; background:var(--dusk); color:var(--ink); font-size:19px; }
   .tok-playbtn:active { transform:scale(0.94); }
 
-  /* ---------- queue (primary) ---------- */
-  .tok-queue-label { font-family:'Fraunces',serif; font-weight:900; font-size:20px; margin:20px 0 10px; }
-  .tok-queue { display:flex; flex-direction:column; gap:8px; overflow-y:auto; flex:1; min-height:0; }
-  .tok-queue-row {
-    display:flex; align-items:center; gap:12px;
-    background:var(--sheet); border-radius:18px; padding:10px 12px;
-    cursor:pointer; text-align:left; border:none; color:var(--ink); font-family:inherit;
+  .tok-queue-toggle {
+    border:none; cursor:pointer; font-family:'Fraunces',serif; font-weight:700; font-size:13.5px;
+    color:var(--ink); background:var(--stage); border-radius:999px; padding:10px 20px;
+    display:flex; align-items:center; gap:6px;
   }
-  .tok-queue-row:active { transform:scale(0.98); }
-  .tok-queue-row.current { background:var(--dusk); }
-  .tok-queue-meta { flex:1; min-width:0; }
-  .tok-queue-title { font-family:'Fraunces',serif; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .tok-queue-artist { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
-  .tok-queue-row.current .tok-queue-artist { color:rgba(255,255,255,0.75); }
-  .tok-queue-dur { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); flex-shrink:0; }
-  .tok-queue-row.current .tok-queue-dur { color:rgba(255,255,255,0.75); }
+  .tok-queue-toggle:active { transform:scale(0.97); }
 
-  .tok-trail { display:flex; gap:5px; justify-content:center; margin-top:14px; flex-wrap:wrap; position:relative; z-index:1; }
-  .tok-dot { width:8px; height:8px; border-radius:50%; }
-  .tok-dot[data-dir="speed"] { background:var(--ember); }
-  .tok-dot[data-dir="stay"]  { background:var(--gold); }
-  .tok-dot[data-dir="slow"]  { background:var(--tide); }
-
-  /* ---------- persistent PILL (available whole song) ---------- */
-  .tok-pill {
-    position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center;
-    gap: 1px; padding: 9px 18px;
-    border-radius: 999px;
-    background: var(--sheet);
-    border: none;
-    cursor: pointer; z-index: 4;
-    transition: transform .15s ease, background .25s ease;
-    max-width: 78%;
-  }
-  .tok-pill:active { transform: translateX(-50%) scale(0.97); }
-  .tok-pill-main { display:flex; align-items:center; gap:6px; font-family:'Fraunces',serif; font-weight:700; font-size:13px; white-space:nowrap; }
-  .tok-pill-sub { font-size:10px; color:var(--muted); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .tok-pill[data-dir="speed"] { color:var(--ember); }
-  .tok-pill[data-dir="stay"]  { color:var(--gold); }
-  .tok-pill[data-dir="slow"]  { color:var(--tide); }
-
-  /* ---------- OVERLAY SHEET ---------- */
+  /* ---------- queue sheet ---------- */
   .tok-backdrop {
-    position:absolute; inset:0;
-    background: rgba(8,5,16,0.6);
-    backdrop-filter: blur(2px);
+    position:fixed; inset:0;
+    background: rgba(6,4,12,0.6);
     opacity:0; pointer-events:none;
     transition: opacity 0.3s ease;
     z-index: 5;
@@ -175,210 +128,127 @@
   .tok-backdrop.open { opacity:1; pointer-events:auto; }
 
   .tok-sheet {
-    position:absolute; left:0; right:0; bottom:0; top:15%;
-    background: var(--sheet);
+    position:fixed; left:0; right:0; bottom:0; top:18%;
+    background: var(--stage);
     border-radius: 28px 28px 0 0;
-    box-shadow: 0 -12px 30px rgba(0,0,0,0.45);
     transform: translateY(102%);
     transition: transform 0.4s cubic-bezier(.22,1,.36,1);
     z-index: 6;
-    padding: 14px 14px 16px;
+    padding: 14px 16px max(16px, env(safe-area-inset-bottom));
     display:flex; flex-direction:column;
-    overflow-y:auto;
   }
   .tok-sheet.open { transform: translateY(0); }
+  .tok-sheet-handle { width:36px; height:4px; border-radius:3px; background:rgba(255,255,255,0.2); margin:0 auto 12px; cursor:pointer; flex-shrink:0; }
+  .tok-sheet-title { font-family:'Fraunces',serif; font-weight:900; font-size:19px; margin-bottom:12px; flex-shrink:0; }
 
-  .tok-sheet-handle { width:34px; height:4px; border-radius:3px; background:rgba(255,255,255,0.2); margin:0 auto 10px; cursor:pointer; }
-
-  .tok-recap { display:flex; align-items:center; gap:9px; margin-bottom:12px; }
-  .tok-recap-text { font-size:11.5px; color:var(--muted); line-height:1.3; }
-  .tok-recap-text strong { color:var(--ink); font-weight:700; }
-
-  .tok-ring-row { display:flex; flex-direction:column; align-items:center; margin-bottom:10px; }
-  .tok-ring-wrap { position:relative; width:96px; height:96px; }
-  .tok-ring-wrap svg { width:100%; height:100%; }
-  .tok-ring-bg { stroke:rgba(255,255,255,0.1); }
-  .tok-ring-fg { stroke: var(--gold); transition: stroke 0.35s ease; }
-  .tok-ring-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-  .tok-secs { font-family:'JetBrains Mono',monospace; font-weight:700; font-size:22px; line-height:1; }
-
-  .tok-options { display:flex; flex-direction:column; gap:8px; }
-  .tok-card {
-    width:100%; text-align:left;
-    background: var(--stage);
-    border:none;
-    border-radius:18px;
-    padding:9px 11px;
-    display:flex; align-items:center; gap:10px;
-    color:var(--ink); cursor:pointer; font-family:inherit;
-    transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, opacity 0.25s ease;
+  .tok-queue { display:flex; flex-direction:column; gap:8px; overflow-y:auto; flex:1; min-height:0; }
+  .tok-queue-row {
+    display:flex; align-items:center; gap:12px;
+    background:var(--sheet); border-radius:18px; padding:9px 12px;
+    cursor:pointer; text-align:left; border:none; color:var(--ink); font-family:inherit; width:100%;
   }
-  .tok-card:active { transform:scale(0.98); }
-  .tok-card:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
-  .tok-card.chosen { background: var(--dusk); }
-  .tok-card.dimmed { opacity: 0.45; }
+  .tok-queue-row:active { transform:scale(0.98); }
+  .tok-queue-row.current { background:var(--dusk); }
+  .tok-cover--queue { width:44px; height:44px; border-radius:13px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--stage); }
+  .tok-queue-meta { flex:1; min-width:0; }
+  .tok-queue-title { font-family:'Fraunces',serif; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tok-queue-artist { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+  .tok-queue-row.current .tok-queue-artist { color:rgba(255,255,255,0.75); }
+  .tok-queue-dur { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); flex-shrink:0; }
+  .tok-queue-row.current .tok-queue-dur { color:rgba(255,255,255,0.75); }
 
-  .tok-card-meta { flex:1; min-width:0; }
-  .tok-card-label { font-family:'Fraunces',serif; font-weight:700; font-size:12.5px; letter-spacing:0.3px; }
-  .tok-card[data-dir="speed"] .tok-card-label { color:var(--ember); }
-  .tok-card[data-dir="stay"]  .tok-card-label { color:var(--gold); }
-  .tok-card[data-dir="slow"]  .tok-card-label { color:var(--tide); }
-  .tok-card-track { font-size:13px; font-weight:600; margin-top:2px; }
-  .tok-card-artist { font-size:11.5px; color:var(--muted); }
-  .tok-card-delta { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); flex-shrink:0; text-align:right; white-space:nowrap; }
-
-  @keyframes tok-pop { 0%{transform:scale(1);} 40%{transform:scale(1.04);} 100%{transform:scale(1);} }
-  .tok-pop { animation: tok-pop 0.4s ease; }
+  .tok-status { text-align:center; color:var(--muted); font-size:13px; margin-top:8px; }
 
   @media (prefers-reduced-motion: reduce) {
-    .tok-card, .tok-sheet, .tok-backdrop, .tok-eq span, .tok-pop, .tok-pill { animation:none !important; transition:none !important; }
+    .tok-vinyl, .tok-sheet, .tok-backdrop { animation:none !important; transition:none !important; }
   }
 </style>
 
 <div class="tok-app">
-  <div class="tok-blob tok-blob--a"></div>
-  <div class="tok-blob tok-blob--b"></div>
-  <div class="tok-blob tok-blob--c"></div>
-
   <div class="tok-head">
-    <div>
-      <div class="tok-wordmark">TOK</div>
-      <div class="tok-sub">dj sufler · demo</div>
-    </div>
+    <div class="tok-wordmark">TOK</div>
     <a class="tok-yt-link" id="tokYtLink" href="#" aria-label="Otvori u YouTubeu">▶</a>
   </div>
 
-  <div class="tok-stage">
-    <div class="tok-miniplayer">
-      <div class="tok-cover tok-cover--mp" id="tokHeroCover"></div>
-      <div class="tok-mp-meta">
-        <div class="tok-eq paused" id="tokEq"><span></span><span></span><span></span></div>
-        <div class="tok-now-title" id="tokNowTitle">Učitavanje playliste…</div>
-        <div class="tok-now-artist" id="tokNowArtist"></div>
-        <div class="tok-now-stats" id="tokNowStats"></div>
-        <div class="tok-progress-track"><div class="tok-progress-fill" id="tokProgress"></div></div>
-        <div class="tok-progress-caption" id="tokRemain"></div>
-      </div>
-      <div class="tok-transport">
-        <button class="tok-skipbtn" id="tokPrevBtn" aria-label="Prošla pjesma">⏮</button>
-        <button class="tok-playbtn" id="tokPlayBtn" aria-label="Pusti / pauziraj">▶</button>
-        <button class="tok-skipbtn" id="tokNextBtn" aria-label="Sljedeća pjesma">⏭</button>
+  <div class="tok-main">
+    <div class="tok-vinyl-wrap">
+      <div class="tok-vinyl" id="tokVinyl">
+        <div class="tok-vinyl-cover" id="tokVinylCover"></div>
       </div>
     </div>
-    <div id="ytPlayer" style="position:absolute; width:1px; height:1px; opacity:0.01; pointer-events:none; overflow:hidden;"></div>
 
-    <div class="tok-queue-label">Odaberi sljedeću</div>
-    <div class="tok-queue" id="tokQueue"></div>
-
-    <div class="tok-trail" id="tokTrail"></div>
-
-    <!-- persistent pill: visible whole song, opens the sheet, shows + lets you change the armed choice -->
-    <button class="tok-pill" id="tokPill" data-dir="stay">
-      <span class="tok-pill-main">🏄 ZADRŽI</span>
-      <span class="tok-pill-sub" id="tokPillSub">→ —</span>
-    </button>
-
-    <!-- overlay -->
-    <div class="tok-backdrop" id="tokBackdrop"></div>
-    <div class="tok-sheet" id="tokSheet">
-      <div class="tok-sheet-handle" id="tokHandle"></div>
-      <div class="tok-recap">
-        <div class="tok-cover tok-cover--mini" id="tokRecapCover"></div>
-        <div class="tok-recap-text">trenutno: <strong id="tokRecapTitle"></strong> — <span id="tokRecapArtist"></span></div>
-      </div>
-
-      <div class="tok-ring-row">
-        <div class="tok-ring-wrap">
-          <svg viewBox="0 0 200 200">
-            <circle class="tok-ring-bg" cx="100" cy="100" r="86" fill="none" stroke-width="11"/>
-            <circle class="tok-ring-fg" id="tokRing" cx="100" cy="100" r="86" fill="none" stroke-width="11"
-                    stroke-linecap="round" stroke-dasharray="540.35" stroke-dashoffset="0"
-                    transform="rotate(-90 100 100)"/>
-          </svg>
-          <div class="tok-ring-center">
-            <div class="tok-secs" id="tokSecs">20</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="tok-options" id="tokOptions">
-        <button class="tok-card" data-dir="speed">
-          <div class="tok-cover tok-cover--card"></div>
-          <div class="tok-card-meta">
-            <div class="tok-card-label">🏎️ UBRZAJ</div>
-            <div class="tok-card-track">—</div>
-            <div class="tok-card-artist">—</div>
-          </div>
-          <div class="tok-card-delta">—</div>
-        </button>
-        <button class="tok-card" data-dir="stay">
-          <div class="tok-cover tok-cover--card"></div>
-          <div class="tok-card-meta">
-            <div class="tok-card-label">🏄 ZADRŽI</div>
-            <div class="tok-card-track">—</div>
-            <div class="tok-card-artist">—</div>
-          </div>
-          <div class="tok-card-delta">—</div>
-        </button>
-        <button class="tok-card" data-dir="slow">
-          <div class="tok-cover tok-cover--card"></div>
-          <div class="tok-card-meta">
-            <div class="tok-card-label">🛑 SPUSTI</div>
-            <div class="tok-card-track">—</div>
-            <div class="tok-card-artist">—</div>
-          </div>
-          <div class="tok-card-delta">—</div>
-        </button>
-      </div>
+    <div class="tok-nowmeta">
+      <div class="tok-now-title" id="tokNowTitle">Učitavanje playliste…</div>
+      <div class="tok-now-artist" id="tokNowArtist"></div>
+      <div class="tok-status" id="tokStatus"></div>
     </div>
+
+    <div class="tok-wave" id="tokWave"></div>
+
+    <div class="tok-transport">
+      <button class="tok-skipbtn" id="tokPrevBtn" aria-label="Prošla pjesma">⏮</button>
+      <button class="tok-playbtn" id="tokPlayBtn" aria-label="Pusti / pauziraj">▶</button>
+      <button class="tok-skipbtn" id="tokNextBtn" aria-label="Sljedeća pjesma">⏭</button>
+    </div>
+
+    <button class="tok-queue-toggle" id="tokQueueToggle">Queue ▾</button>
   </div>
 
+  <div id="ytPlayer" style="position:absolute; width:1px; height:1px; opacity:0.01; pointer-events:none; overflow:hidden;"></div>
+
+  <div class="tok-backdrop" id="tokBackdrop"></div>
+  <div class="tok-sheet" id="tokSheet">
+    <div class="tok-sheet-handle" id="tokHandle"></div>
+    <div class="tok-sheet-title">Queue</div>
+    <div class="tok-queue" id="tokQueue"></div>
+  </div>
 </div>
 
 <script>
 (function(){
   const YT_API_KEY = 'AIzaSyCkZpbb-oVsH_s2Yjn5AAql3Pfke0MExTA';
   const PLAYLIST_ID = 'PL9qqRdUh4PoNhlUS4g69SQTxteQKHVAe-';
-  const LAST_CALL_S = 6; // zadnjih ~6s: pill se sam otvori kao podsjetnik (ako ga korisnik već nije sam otvorio/zatvorio)
 
   let tracks = [];
   let currentIndex = 0;
-  let history = [];
-  let currentCandidates = null;
   let player = null;
 
-  const state = { playing:false, sheetOpen:false, armedDir:'stay', autoOpenedThisSong:false, userClosedThisSong:false };
+  const state = { playing:false, queueOpen:false };
 
   const els = {
     playBtn: document.getElementById('tokPlayBtn'),
-    heroCover: document.getElementById('tokHeroCover'),
-    eq: document.getElementById('tokEq'),
+    prevBtn: document.getElementById('tokPrevBtn'),
+    nextBtn: document.getElementById('tokNextBtn'),
+    vinyl: document.getElementById('tokVinyl'),
+    vinylCover: document.getElementById('tokVinylCover'),
     title: document.getElementById('tokNowTitle'),
     artist: document.getElementById('tokNowArtist'),
-    stats: document.getElementById('tokNowStats'),
-    progress: document.getElementById('tokProgress'),
-    remain: document.getElementById('tokRemain'),
-    trail: document.getElementById('tokTrail'),
-    pill: document.getElementById('tokPill'),
-    pillSub: document.getElementById('tokPillSub'),
+    status: document.getElementById('tokStatus'),
+    wave: document.getElementById('tokWave'),
+    ytLink: document.getElementById('tokYtLink'),
+    queueToggle: document.getElementById('tokQueueToggle'),
     backdrop: document.getElementById('tokBackdrop'),
     sheet: document.getElementById('tokSheet'),
     handle: document.getElementById('tokHandle'),
-    recapCover: document.getElementById('tokRecapCover'),
-    recapTitle: document.getElementById('tokRecapTitle'),
-    recapArtist: document.getElementById('tokRecapArtist'),
-    secs: document.getElementById('tokSecs'),
-    ring: document.getElementById('tokRing'),
-    options: document.getElementById('tokOptions'),
-    ytLink: document.getElementById('tokYtLink'),
-    prevBtn: document.getElementById('tokPrevBtn'),
-    nextBtn: document.getElementById('tokNextBtn'),
     queue: document.getElementById('tokQueue')
   };
 
-  const CIRC = 2 * Math.PI * 86;
-  const accent = { speed:'var(--ember)', stay:'var(--dusk)', slow:'var(--tide)' };
-  const dirLabel = { speed:'🏎️ UBRZAJ', stay:'🏄 ZADRŽI', slow:'🛑 SPUSTI' };
+  const WAVE_BARS = 40;
+  function buildWave(){
+    let html = '';
+    for (let i = 0; i < WAVE_BARS; i++) {
+      const h = 25 + Math.round(Math.sin(i * 1.3) * 20 + Math.sin(i * 0.4) * 30 + 30);
+      html += '<div class="tok-wave-bar" style="height:' + Math.max(15, Math.min(100, h)) + '%"></div>';
+    }
+    els.wave.innerHTML = html;
+  }
+  function updateWaveProgress(pct){
+    const bars = els.wave.children;
+    const cutoff = Math.round((pct / 100) * bars.length);
+    for (let i = 0; i < bars.length; i++) {
+      bars[i].classList.toggle('played', i < cutoff);
+    }
+  }
 
   function ytThumb(videoId){
     return 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
@@ -439,120 +309,66 @@
     }
   }
 
-  function coverHTML(t, sizeClass, idAttr){
-    return '<div class="tok-cover ' + sizeClass + '"' + (idAttr ? ' id="' + idAttr + '"' : '') +
-           ' style="background-image:url(\'' + t.thumb + '\')"></div>';
-  }
-
-  function pickCandidates(){
-    const n = tracks.length;
-    const stayIdx = (currentIndex + 1) % n;
-    const used = new Set(history.slice(-3).map(t => t.id).concat([tracks[currentIndex].id, tracks[stayIdx].id]));
-    function pickRandom(exclude){
-      const opts = tracks.filter(t => !used.has(t.id) && !exclude.has(t.id));
-      const pool = opts.length ? opts : tracks.filter(t => t.id !== tracks[currentIndex].id);
-      return pool[Math.floor(Math.random() * pool.length)];
-    }
-    const speedT = pickRandom(new Set());
-    const slowT = pickRandom(new Set([speedT.id]));
-    return { speed: speedT, stay: tracks[stayIdx], slow: slowT };
-  }
-
-  function renderNowPlaying(t){
-    els.heroCover.outerHTML = coverHTML(t, 'tok-cover--hero', 'tokHeroCover');
-    els.heroCover = document.getElementById('tokHeroCover');
-    els.title.textContent = t.title;
-    els.artist.textContent = t.artist;
-    els.stats.textContent = fmtTime(t.durationSec) + ' · YouTube Music';
-  }
-
-  function renderOptionsBase(cands){
-    ['speed','stay','slow'].forEach(dir => {
-      const card = els.options.querySelector('[data-dir="' + dir + '"]');
-      const t = cands[dir];
-      const coverSlot = card.querySelector('.tok-cover');
-      coverSlot.outerHTML = coverHTML(t, 'tok-cover--card');
-      card.querySelector('.tok-card-track').textContent = t.title;
-      card.querySelector('.tok-card-artist').textContent = t.artist;
-      card.querySelector('.tok-card-delta').textContent = fmtTime(t.durationSec);
-    });
-    refreshChosenHighlight();
-  }
-
-  function refreshChosenHighlight(){
-    ['speed','stay','slow'].forEach(dir => {
-      const card = els.options.querySelector('[data-dir="' + dir + '"]');
-      card.classList.toggle('chosen', dir === state.armedDir);
-      card.classList.toggle('dimmed', dir !== state.armedDir);
-    });
-  }
-
-  function renderPill(){
-    const t = currentCandidates ? currentCandidates[state.armedDir] : null;
-    els.pill.setAttribute('data-dir', state.armedDir);
-    els.pill.querySelector('.tok-pill-main').textContent = dirLabel[state.armedDir];
-    els.pillSub.textContent = t ? ('→ ' + t.title + ' · ' + t.artist) : '→ —';
-  }
-
-  function pushTrailDot(dir){
-    const dot = document.createElement('div');
-    dot.className = 'tok-dot';
-    dot.setAttribute('data-dir', dir);
-    els.trail.appendChild(dot);
-  }
-
   function renderQueue(){
-    const upcoming = [];
-    for (let i = 1; i <= 8 && i < tracks.length; i++) {
-      upcoming.push(tracks[(currentIndex + i) % tracks.length]);
-    }
-    els.queue.innerHTML = [tracks[currentIndex]].concat(upcoming).map((t, i) => {
-      const isCurrent = i === 0;
-      return '<button class="tok-queue-row' + (isCurrent ? ' current' : '') + '" data-id="' + t.id + '">' +
-        coverHTML(t, 'tok-cover--queue') +
+    els.queue.innerHTML = tracks.map((t, i) => {
+      const isCurrent = i === currentIndex;
+      return '<button class="tok-queue-row' + (isCurrent ? ' current' : '') + '" data-idx="' + i + '">' +
+        '<div class="tok-cover--queue" style="background-image:url(\'' + t.thumb + '\')"></div>' +
         '<div class="tok-queue-meta"><div class="tok-queue-title">' + t.title + '</div>' +
         '<div class="tok-queue-artist">' + t.artist + '</div></div>' +
         '<div class="tok-queue-dur">' + fmtTime(t.durationSec) + '</div></button>';
     }).join('');
   }
 
-  function jumpToTrack(idx, autoplay){
-    history.push(tracks[currentIndex]);
-    currentIndex = idx;
-    closeSheet(false);
-    loadCurrentTrack(autoplay);
+  function openQueue(){
+    state.queueOpen = true;
+    els.backdrop.classList.add('open');
+    els.sheet.classList.add('open');
+  }
+  function closeQueue(){
+    state.queueOpen = false;
+    els.backdrop.classList.remove('open');
+    els.sheet.classList.remove('open');
   }
 
+  els.queueToggle.addEventListener('click', () => state.queueOpen ? closeQueue() : openQueue());
+  els.backdrop.addEventListener('click', closeQueue);
+  els.handle.addEventListener('click', closeQueue);
   els.queue.addEventListener('click', (e) => {
     const row = e.target.closest('.tok-queue-row');
     if (!row) return;
-    const idx = tracks.findIndex(t => t.id === row.getAttribute('data-id'));
-    if (idx >= 0 && idx !== currentIndex) jumpToTrack(idx, true);
+    const idx = parseInt(row.getAttribute('data-idx'), 10);
+    closeQueue();
+    if (idx !== currentIndex) jumpToTrack(idx, true);
   });
 
-  els.prevBtn.addEventListener('click', () => {
-    jumpToTrack((currentIndex - 1 + tracks.length) % tracks.length, true);
-  });
-  els.nextBtn.addEventListener('click', () => {
-    jumpToTrack((currentIndex + 1) % tracks.length, true);
-  });
+  function updateMediaSession(t){
+    if (!('mediaSession' in navigator)) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: t.title, artist: t.artist, album: 'YouTube Music',
+      artwork: [{ src: t.thumb, sizes: '480x360', type: 'image/jpeg' }]
+    });
+  }
+
+  const isAndroid = /Android/i.test(navigator.userAgent);
+
+  function braveLink(videoId){
+    const target = 'music.youtube.com/watch?v=' + videoId;
+    if (!isAndroid) return 'https://' + target;
+    return 'intent://' + target +
+      '#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url=' +
+      encodeURIComponent('https://' + target) + ';end';
+  }
 
   function loadCurrentTrack(autoplay){
     const t = tracks[currentIndex];
-    renderNowPlaying(t);
-    els.recapCover.outerHTML = coverHTML(t, 'tok-cover--mini', 'tokRecapCover');
-    els.recapCover = document.getElementById('tokRecapCover');
-    els.recapTitle.textContent = t.title;
-    els.recapArtist.textContent = t.artist;
-    els.ytLink.href = 'https://www.youtube.com/watch?v=' + t.id;
+    els.vinylCover.style.backgroundImage = "url('" + t.thumb + "')";
+    els.title.textContent = t.title;
+    els.artist.textContent = t.artist;
+    els.status.textContent = '';
+    els.ytLink.href = braveLink(t.id);
     renderQueue();
-
-    currentCandidates = pickCandidates();
-    state.armedDir = 'stay';
-    state.autoOpenedThisSong = false;
-    state.userClosedThisSong = false;
-    renderOptionsBase(currentCandidates);
-    renderPill();
+    updateMediaSession(t);
 
     if (player && typeof player.loadVideoById === 'function') {
       if (autoplay) player.loadVideoById(t.id);
@@ -560,53 +376,17 @@
     }
   }
 
-  function openSheet(){
-    state.sheetOpen = true;
-    refreshChosenHighlight();
-    els.backdrop.classList.add('open');
-    els.sheet.classList.add('open');
-    updateProgressUI();
+  function jumpToTrack(idx, autoplay){
+    currentIndex = idx;
+    loadCurrentTrack(autoplay);
   }
 
-  function closeSheet(userInitiated){
-    state.sheetOpen = false;
-    if (userInitiated) state.userClosedThisSong = true;
-    els.backdrop.classList.remove('open');
-    els.sheet.classList.remove('open');
-  }
-
-  function armChoice(dir){
-    state.armedDir = dir;
-    refreshChosenHighlight();
-    renderPill();
-    const card = els.options.querySelector('[data-dir="' + dir + '"]');
-    card.classList.add('tok-pop');
-    setTimeout(() => card.classList.remove('tok-pop'), 400);
-    setTimeout(() => closeSheet(false), 500);
-  }
-
-  function commitEndOfSong(){
-    const picked = currentCandidates[state.armedDir];
-    history.push(tracks[currentIndex]);
-    currentIndex = tracks.findIndex(t => t.id === picked.id);
-    pushTrailDot(state.armedDir);
-    closeSheet(false);
-    loadCurrentTrack(true);
-  }
-
-  els.options.addEventListener('click', (e) => {
-    const card = e.target.closest('.tok-card');
-    if (!card) return;
-    armChoice(card.getAttribute('data-dir'));
+  els.prevBtn.addEventListener('click', () => {
+    jumpToTrack((currentIndex - 1 + tracks.length) % tracks.length, true);
   });
-
-  els.pill.addEventListener('click', () => {
-    if (state.sheetOpen) closeSheet(true);
-    else openSheet();
+  els.nextBtn.addEventListener('click', () => {
+    jumpToTrack((currentIndex + 1) % tracks.length, true);
   });
-  els.backdrop.addEventListener('click', () => closeSheet(true));
-  els.handle.addEventListener('click', () => closeSheet(true));
-
   els.playBtn.addEventListener('click', () => {
     if (!player || typeof player.getPlayerState !== 'function') return;
     if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo();
@@ -617,13 +397,15 @@
     if (e.data === YT.PlayerState.PLAYING) {
       state.playing = true;
       els.playBtn.textContent = '❙❙';
-      els.eq.classList.remove('paused');
+      els.vinyl.classList.add('spinning');
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
     } else if (e.data === YT.PlayerState.PAUSED) {
       state.playing = false;
       els.playBtn.textContent = '▶';
-      els.eq.classList.add('paused');
+      els.vinyl.classList.remove('spinning');
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
     } else if (e.data === YT.PlayerState.ENDED) {
-      commitEndOfSong();
+      jumpToTrack((currentIndex + 1) % tracks.length, true);
     }
   }
 
@@ -634,30 +416,20 @@
       playerVars: { autoplay:0, controls:0, disablekb:1, modestbranding:1, rel:0, playsinline:1 },
       events: { onStateChange: onPlayerStateChange }
     });
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', () => player.playVideo());
+      navigator.mediaSession.setActionHandler('pause', () => player.pauseVideo());
+      navigator.mediaSession.setActionHandler('previoustrack', () => els.prevBtn.click());
+      navigator.mediaSession.setActionHandler('nexttrack', () => els.nextBtn.click());
+    }
   };
 
   setInterval(() => {
     if (!player || typeof player.getCurrentTime !== 'function' || !state.playing) return;
-
     const cur = player.getCurrentTime();
     const dur = player.getDuration() || tracks[currentIndex].durationSec || 0;
     if (!dur) return;
-
-    els.progress.style.width = Math.min(100, (cur / dur) * 100) + '%';
-    els.progress.style.background = 'var(--' + (state.armedDir === 'speed' ? 'ember' : state.armedDir === 'slow' ? 'tide' : 'dusk') + ')';
-    const remainSec = Math.max(0, Math.ceil(dur - cur));
-    els.remain.textContent = remainSec + 's';
-
-    if (state.sheetOpen) {
-      els.secs.textContent = remainSec;
-      els.ring.style.strokeDashoffset = Math.max(0, CIRC * (cur / dur));
-      els.ring.style.stroke = accent[state.armedDir];
-    }
-
-    if (!state.autoOpenedThisSong && !state.userClosedThisSong && !state.sheetOpen && remainSec <= LAST_CALL_S) {
-      state.autoOpenedThisSong = true;
-      openSheet();
-    }
+    updateWaveProgress(Math.min(100, (cur / dur) * 100));
   }, 250);
 
   (async function bootstrap(){
@@ -672,7 +444,9 @@
       els.title.textContent = 'Playlist je prazna ili nije javno dostupna';
       return;
     }
-    els.remain.textContent = 'pritisni ▶ za reprodukciju';
+    buildWave();
+    currentIndex = Math.floor(Math.random() * tracks.length);
+    els.status.textContent = 'pritisni ▶ za reprodukciju';
     loadCurrentTrack(false);
 
     const tag = document.createElement('script');
