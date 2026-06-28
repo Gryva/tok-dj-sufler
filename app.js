@@ -219,20 +219,26 @@
       return;
     }
 
-    const candidateIdxs = new Set(
-      currentCandidates ? ['up', 'flow', 'down'].map(dir => currentCandidates[dir].idx) : []
-    );
+    const candidateDirByIdx = {};
+    if (currentCandidates) {
+      ['up', 'flow', 'down'].forEach(dir => {
+        candidateDirByIdx[currentCandidates[dir].idx] = dir;
+      });
+    }
+    const CANDIDATE_ICON = { up: '🔥', flow: '🌊', down: '🌙' };
 
     els.queue.innerHTML = indices.map(i => {
       const t = tracks[i];
       const isCurrent = i === currentIndex;
-      const isCandidate = !isCurrent && candidateIdxs.has(i);
+      const dir = !isCurrent ? candidateDirByIdx[i] : null;
+      const isCandidate = !!dir;
       const bpm = window.TokEngine ? window.TokEngine.getBPM(t) : null;
       return '<button class="tok-queue-row' + (isCurrent ? ' current' : '') + (isCandidate ? ' candidate' : '') + '" data-idx="' + i + '">' +
         '<div class="tok-cover--queue" style="background-image:url(\'' + t.thumb + '\')"></div>' +
         '<div class="tok-queue-meta"><div class="tok-queue-title">' + t.title + '</div>' +
         '<div class="tok-queue-artist">' + t.artist + '</div></div>' +
         (bpm ? '<div class="tok-queue-bpm">' + bpm + ' BPM</div>' : '') +
+        (isCandidate ? '<div class="tok-queue-candicon">' + CANDIDATE_ICON[dir] + '</div>' : '') +
         '<div class="tok-queue-dur">' + fmtTime(t.durationSec) + '</div></button>';
     }).join('');
   }
@@ -409,7 +415,7 @@
     localStorage.setItem('tok_order', order);
     els.orderIcon.innerHTML = ORDER_ICONS[order];
     if (els.orderLabel) els.orderLabel.textContent = ORDER_LABELS[order];
-    if (tracks.length) renderDirs();
+    if (tracks.length) { renderDirs(); renderQueue(); }
   }
   els.orderToggle.addEventListener('click', () => {
     const next = ORDER_CYCLE[(ORDER_CYCLE.indexOf(state.order) + 1) % ORDER_CYCLE.length];
