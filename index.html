@@ -78,64 +78,64 @@
     flex-direction: column;
   }
 
-  .tok-hero { display:flex; flex-direction:column; align-items:center; text-align:center; gap:14px; }
+  /* ---------- compact mini-player (secondary) ---------- */
+  .tok-miniplayer { display:flex; align-items:center; gap:10px; }
   .tok-cover {
     position: relative;
-    border-radius: 28px;
+    border-radius: 14px;
     overflow: hidden;
     flex-shrink: 0;
     background-color: var(--sheet);
     background-size: cover;
     background-position: center;
-    box-shadow: 0 14px 30px rgba(0,0,0,0.45);
   }
-  .tok-cover--hero { width: 168px; height: 168px; border-radius: 36px; }
+  .tok-cover--mp { width: 52px; height: 52px; border-radius: 14px; }
   .tok-cover--mini { width: 28px; height: 28px; border-radius: 10px; }
-  .tok-cover--queue { width: 40px; height: 40px; border-radius: 12px; }
+  .tok-cover--queue { width: 44px; height: 44px; border-radius: 13px; }
   .tok-cover--card { width: 42px; height: 42px; border-radius: 12px; }
 
-  .tok-hero-meta { width:100%; }
-  .tok-eq { display:flex; gap:3px; align-items:flex-end; justify-content:center; height:13px; margin-bottom:7px; }
+  .tok-mp-meta { flex:1; min-width:0; }
+  .tok-eq { display:flex; gap:3px; align-items:flex-end; height:11px; margin-bottom:3px; }
   .tok-eq span { width:3px; border-radius:2px; background: var(--gold); height:30%; animation: tok-eq-bounce 0.9s ease-in-out infinite; }
   .tok-eq span:nth-child(2){ animation-delay:0.15s; }
   .tok-eq span:nth-child(3){ animation-delay:0.3s; }
   .tok-eq.paused span { animation-play-state: paused; height:25%; }
   @keyframes tok-eq-bounce { 0%,100%{ height:25%; } 50%{ height:100%; } }
 
-  .tok-now-title { font-family:'Fraunces',serif; font-weight:700; font-size:21px; line-height:1.22; }
-  .tok-now-artist { color:var(--muted); font-size:13.5px; margin-top:3px; }
-  .tok-now-stats { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); margin-top:8px; }
+  .tok-now-title { font-family:'Fraunces',serif; font-weight:700; font-size:14.5px; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tok-now-artist { color:var(--muted); font-size:11.5px; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tok-now-stats { display:none; }
 
-  .tok-progress-track { height:6px; background:rgba(255,255,255,0.1); border-radius:6px; overflow:hidden; margin-top:14px; }
-  .tok-progress-fill { height:100%; width:0%; background:var(--gold); border-radius:6px; transition: width 0.22s linear, background .3s ease; }
-  .tok-progress-caption { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); margin-top:6px; text-align:right; }
+  .tok-progress-track { height:3px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden; margin-top:6px; }
+  .tok-progress-fill { height:100%; width:0%; background:var(--gold); border-radius:3px; transition: width 0.22s linear, background .3s ease; }
+  .tok-progress-caption { font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); margin-top:3px; }
 
   /* ---------- transport ---------- */
-  .tok-transport { display:flex; align-items:center; justify-content:center; gap:18px; margin-top:18px; }
+  .tok-transport { display:flex; align-items:center; justify-content:center; gap:8px; flex-shrink:0; }
   .tok-transport button {
     border:none; cursor:pointer; color:var(--ink); font-family:inherit;
     display:flex; align-items:center; justify-content:center;
   }
-  .tok-skipbtn { width:42px; height:42px; border-radius:50%; background:var(--sheet); font-size:15px; }
+  .tok-skipbtn { width:30px; height:30px; border-radius:50%; background:var(--sheet); font-size:12px; }
   .tok-skipbtn:active { transform:scale(0.92); }
-  .tok-playbtn { width:62px; height:62px; border-radius:50%; background:var(--gold); color:#241B3F; font-size:20px; box-shadow:0 10px 24px rgba(255,200,87,0.35); }
+  .tok-playbtn { width:42px; height:42px; border-radius:50%; background:var(--gold); color:#241B3F; font-size:15px; }
   .tok-playbtn:active { transform:scale(0.94); }
 
-  /* ---------- queue ---------- */
-  .tok-queue-label { font-family:'Fraunces',serif; font-weight:700; font-size:13px; color:var(--muted); margin:20px 0 8px; }
-  .tok-queue { display:flex; flex-direction:column; gap:6px; overflow-y:auto; flex:1; min-height:0; }
+  /* ---------- queue (primary) ---------- */
+  .tok-queue-label { font-family:'Fraunces',serif; font-weight:900; font-size:20px; margin:20px 0 10px; }
+  .tok-queue { display:flex; flex-direction:column; gap:8px; overflow-y:auto; flex:1; min-height:0; }
   .tok-queue-row {
-    display:flex; align-items:center; gap:10px;
-    background:var(--sheet); border-radius:16px; padding:8px 10px;
+    display:flex; align-items:center; gap:12px;
+    background:var(--sheet); border-radius:18px; padding:10px 12px;
     cursor:pointer; text-align:left; border:none; color:var(--ink); font-family:inherit;
   }
   .tok-queue-row:active { transform:scale(0.98); }
   .tok-queue-row.current { background:var(--dusk); }
   .tok-queue-meta { flex:1; min-width:0; }
-  .tok-queue-title { font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .tok-queue-artist { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tok-queue-title { font-family:'Fraunces',serif; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tok-queue-artist { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
   .tok-queue-row.current .tok-queue-artist { color:rgba(255,255,255,0.75); }
-  .tok-queue-dur { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); flex-shrink:0; }
+  .tok-queue-dur { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); flex-shrink:0; }
   .tok-queue-row.current .tok-queue-dur { color:rgba(255,255,255,0.75); }
 
   .tok-trail { display:flex; gap:5px; justify-content:center; margin-top:14px; flex-wrap:wrap; position:relative; z-index:1; }
@@ -249,26 +249,25 @@
   </div>
 
   <div class="tok-stage">
-    <div class="tok-hero">
-      <div class="tok-cover tok-cover--hero" id="tokHeroCover"></div>
-      <div class="tok-hero-meta">
+    <div class="tok-miniplayer">
+      <div class="tok-cover tok-cover--mp" id="tokHeroCover"></div>
+      <div class="tok-mp-meta">
         <div class="tok-eq paused" id="tokEq"><span></span><span></span><span></span></div>
         <div class="tok-now-title" id="tokNowTitle">Učitavanje playliste…</div>
         <div class="tok-now-artist" id="tokNowArtist"></div>
         <div class="tok-now-stats" id="tokNowStats"></div>
         <div class="tok-progress-track"><div class="tok-progress-fill" id="tokProgress"></div></div>
         <div class="tok-progress-caption" id="tokRemain"></div>
-
-        <div class="tok-transport">
-          <button class="tok-skipbtn" id="tokPrevBtn" aria-label="Prošla pjesma">⏮</button>
-          <button class="tok-playbtn" id="tokPlayBtn" aria-label="Pusti / pauziraj">▶</button>
-          <button class="tok-skipbtn" id="tokNextBtn" aria-label="Sljedeća pjesma">⏭</button>
-        </div>
+      </div>
+      <div class="tok-transport">
+        <button class="tok-skipbtn" id="tokPrevBtn" aria-label="Prošla pjesma">⏮</button>
+        <button class="tok-playbtn" id="tokPlayBtn" aria-label="Pusti / pauziraj">▶</button>
+        <button class="tok-skipbtn" id="tokNextBtn" aria-label="Sljedeća pjesma">⏭</button>
       </div>
     </div>
     <div id="ytPlayer" style="position:absolute; width:1px; height:1px; opacity:0.01; pointer-events:none; overflow:hidden;"></div>
 
-    <div class="tok-queue-label">Queue</div>
+    <div class="tok-queue-label">Odaberi sljedeću</div>
     <div class="tok-queue" id="tokQueue"></div>
 
     <div class="tok-trail" id="tokTrail"></div>
