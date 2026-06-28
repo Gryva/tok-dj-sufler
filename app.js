@@ -1,6 +1,7 @@
 import { fetchPlaylistTracks, fetchPlaylistInfo, fmtTime, extractPlaylistId } from './js/youtube-api.js';
 import { createVinylColorPicker } from './js/vinyl-color.js';
 import { attachLongPress } from './js/long-press.js';
+import { saveTracksCache, loadTracksCache, savePlaylistInfoCache, loadPlaylistInfoCache } from './js/track-cache.js';
 
 if (window.TokEngine) window.TokEngine.init();
 
@@ -65,7 +66,11 @@ const els = {
   songTags: document.getElementById('tokSongTags'),
   songError: document.getElementById('tokSongError'),
   songCancel: document.getElementById('tokSongCancel'),
-  songSave: document.getElementById('tokSongSave')
+  songSave: document.getElementById('tokSongSave'),
+  dbExport: document.getElementById('tokDbExport'),
+  dbImport: document.getElementById('tokDbImport'),
+  dbImportFile: document.getElementById('tokDbImportFile'),
+  dbStatus: document.getElementById('tokDbStatus')
 };
 
 const applyVinylColor = createVinylColorPicker();
@@ -101,8 +106,22 @@ els.wave.addEventListener('click', (e) => {
 
 // ---------- playlist data ----------
 
+let isOffline = false;
+
 async function fetchPlaylist(){
-  tracks = await fetchPlaylistTracks(YT_API_KEY, PLAYLIST_ID);
+  try {
+    tracks = await fetchPlaylistTracks(YT_API_KEY, PLAYLIST_ID);
+    isOffline = false;
+    saveTracksCache(PLAYLIST_ID, tracks);
+  } catch (err) {
+    // No signal / API unreachable — fall back to whatever we last fetched
+    // successfully for this playlist instead of leaving the DJ with a dead
+    // app mid-set. Only gives up if there's truly nothing cached yet.
+    const cached = loadTracksCache(PLAYLIST_ID);
+    if (!cached) throw err;
+    tracks = cached.tracks;
+    isOffline = true;
+  }
 }
 
 function renderPlaylistInfo(){
@@ -136,6 +155,8 @@ async function refreshPlaylist(){
 
   tracks = fresh;
   if (newIdx !== -1) currentIndex = newIdx;
+  saveTracksCache(PLAYLIST_ID, fresh);
+  if (isOffline) { isOffline = false; els.status.textContent = ''; }
 
   renderQueue();
 }
@@ -185,6 +206,50 @@ if (els.queueSearch) {
   els.queueSearch.addEventListener('input', renderQueue);
 }
 
+// ---------- local song-database backup (export/import to a JSON file) ----------
+// Lets a DJ carry the curated suggestion database between devices, or keep
+// an offline backup on the laptop itself — independent of network access.
+
+function showDbStatus(msg){
+  if (!els.dbStatus) return;
+  els.dbStatus.textContent = msg;
+  setTimeout(() => { if (els.dbStatus.textContent === msg) els.dbStatus.textContent = ''; }, 4000);
+}
+
+if (els.dbExport) {
+  els.dbExport.addEventListener('click', () => {
+    if (!window.TokEngine) return;
+    const blob = new Blob([window.TokEngine.exportDatabaseJSON()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tok-baza-pjesama.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    showDbStatus('Baza spremljena.');
+  });
+}
+if (els.dbImport && els.dbImportFile) {
+  els.dbImport.addEventListener('click', () => els.dbImportFile.click());
+  els.dbImportFile.addEventListener('change', () => {
+    const file = els.dbImportFile.files[0];
+    els.dbImportFile.value = '';
+    if (!file || !window.TokEngine) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const count = window.TokEngine.importDatabaseJSON(reader.result);
+        showDbStatus('Učitano ' + count + ' pjesama.');
+        if (tracks.length) { renderQueue(); renderDirs(); }
+      } catch (err) {
+        showDbStatus(String((err && err.message) || err));
+      }
+    };
+    reader.onerror = () => showDbStatus('Greška kod čitanja datoteke.');
+    reader.readAsText(file);
+  });
+}
+
 function scrollQueueToCurrent(){
   const row = els.queue.querySelector('.tok-queue-row.current');
   if (row) row.scrollIntoView({ block: 'center' });
@@ -197,7 +262,13 @@ function openQueue(){
   scrollQueueToCurrent();
   refreshPlaylist().then(scrollQueueToCurrent);
   if (!playlistInfo) {
-    fetchPlaylistInfo(YT_API_KEY, PLAYLIST_ID).then(info => { playlistInfo = info; renderPlaylistInfo(); }).catch(() => {});
+    playlistInfo = loadPlaylistInfoCache(PLAYLIST_ID);
+    if (playlistInfo) renderPlaylistInfo();
+    fetchPlaylistInfo(YT_API_KEY, PLAYLIST_ID).then(info => {
+      playlistInfo = info;
+      savePlaylistInfoCache(PLAYLIST_ID, info);
+      renderPlaylistInfo();
+    }).catch(() => {});
   }
 }
 function closeQueue(){
@@ -524,12 +595,15 @@ setInterval(() => {
     els.title.textContent = 'Playlist je prazna ili nije javno dostupna';
     return;
   }
+  if (window.TokEngine) window.TokEngine.ensureEntriesForTracks(tracks);
   buildWave();
   const lastId = localStorage.getItem('tok_last_track_id');
   const lastIdx = lastId ? tracks.findIndex(t => t.id === lastId) : -1;
   currentIndex = lastIdx !== -1 ? lastIdx : Math.floor(Math.random() * tracks.length);
-  els.status.textContent = 'pritisni ▶ za reprodukciju';
   loadCurrentTrack(false);
+  // updateNowPlayingUI() (called by loadCurrentTrack) clears els.status, so
+  // the offline notice has to be set after it to actually be visible.
+  if (isOffline) els.status.textContent = 'offline način (spremljena lista)';
 
   const tag = document.createElement('script');
   tag.src = 'https://www.youtube.com/iframe_api';

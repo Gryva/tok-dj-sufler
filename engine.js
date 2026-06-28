@@ -252,8 +252,54 @@
     return song;
   }
 
+  // Auto-grows the database to cover whatever playlist is actually loaded,
+  // instead of relying solely on the hand-curated DEFAULT_DATABASE shipped
+  // in this file. Any track without a match gets a bare entry (no bpm/key/
+  // tags/suggestions yet) so it at least shows up as an editable, suggestable
+  // song — the DJ can fill in the details later via the song modal. Cheap
+  // no-op once everything's already covered, so safe to call on every load.
+  function ensureEntriesForTracks(tracks){
+    const db = getDatabase();
+    let added = 0;
+    (tracks || []).forEach(track => {
+      if (!findSongForTrack(track, db)) {
+        db.push({
+          id: makeId(track), title: track.title, artist: track.artist,
+          bpm: null, key: '', energy: 3, tags: [],
+          suggestions: { speed_up: [], stay: [], slow_down: [] }
+        });
+        added++;
+      }
+    });
+    if (added) saveDatabase(db);
+    return added;
+  }
+
+  function exportDatabaseJSON(){
+    return JSON.stringify(getDatabase(), null, 2);
+  }
+
+  // Restores the database from a previously exported JSON backup (e.g. a
+  // local file picked from disk on a venue's offline laptop). Validates the
+  // shape loosely — just enough to avoid corrupting localStorage with junk —
+  // and throws a descriptive error otherwise so the caller can surface it.
+  function importDatabaseJSON(json){
+    let parsed;
+    try {
+      parsed = JSON.parse(json);
+    } catch (e) {
+      throw new Error('Datoteka nije valjan JSON.');
+    }
+    if (!Array.isArray(parsed) || !parsed.every(s => s && typeof s.id === 'string')) {
+      throw new Error('Datoteka ne sadrži ispravnu bazu pjesama.');
+    }
+    saveDatabase(parsed);
+    return parsed.length;
+  }
+
   window.TokEngine = {
     init, getDatabase, saveDatabase, getSuggestions, findSongForTrack, getBPM,
-    getOrCreateSongForTrack, upsertSongForTrack
+    getOrCreateSongForTrack, upsertSongForTrack, ensureEntriesForTracks,
+    exportDatabaseJSON, importDatabaseJSON
   };
 })();

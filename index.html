@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TOK">
-<link rel="stylesheet" href="style.css?v=34">
+<link rel="stylesheet" href="style.css?v=35">
 </head>
 <body style="margin:0; background:#16100E; height:100%;">
 
@@ -116,6 +116,13 @@
 
     <input class="tok-queue-search" id="tokQueueSearch" type="text" placeholder="Pretraži pjesme...">
 
+    <div class="tok-db-actions">
+      <button class="tok-db-btn" id="tokDbExport">⤓ Spremi bazu</button>
+      <button class="tok-db-btn" id="tokDbImport">⤒ Učitaj bazu</button>
+      <input type="file" id="tokDbImportFile" accept="application/json" style="display:none">
+    </div>
+    <div class="tok-db-status" id="tokDbStatus"></div>
+
     <div class="tok-queue" id="tokQueue"></div>
   </div>
 
@@ -159,7 +166,7 @@
   </div>
 </div>
 
-<script src="engine.js?v=34"></script>
-<script type="module" src="app.js?v=34"></script>
+<script src="engine.js?v=35"></script>
+<script type="module" src="app.js?v=35"></script>
 </body>
 </html>
