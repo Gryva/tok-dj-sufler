@@ -123,6 +123,14 @@ html, body { height:100%; margin:0; }
 .tok-dir.chosen .tok-dir-icon svg { fill:currentColor; stroke:none; }
 .tok-dir[data-dir="flow"].chosen .tok-dir-icon svg { fill:none; stroke:currentColor; stroke-width:2.6; }
 
+/* "play next" just swapped this card's track in — brief glow so it reads
+   as a deliberate replacement rather than the usual suggestion refresh. */
+.tok-dir-replaced { animation: tok-dir-replaced-pulse 0.9s ease-out; }
+@keyframes tok-dir-replaced-pulse {
+  0% { box-shadow: 0 0 0 2px #E2401D, 0 0 18px rgba(226,64,29,0.7); }
+  100% { box-shadow: 0 0 0 0 rgba(226,64,29,0); }
+}
+
 /* ---------- transport ---------- */
 .tok-transport {
   display:flex; align-items:center; justify-content:center; gap:16px;

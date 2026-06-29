@@ -394,6 +394,13 @@ function playNext(idx){
   state.armedDir = 'flow';
   updateDirCards();
   renderQueue();
+  closeQueue();
+  const flowCard = els.dirs.querySelector('[data-dir="flow"]');
+  if (flowCard) {
+    flowCard.classList.remove('tok-dir-replaced');
+    void flowCard.offsetWidth;
+    flowCard.classList.add('tok-dir-replaced');
+  }
   if (navigator.vibrate) navigator.vibrate(14);
 }
 
