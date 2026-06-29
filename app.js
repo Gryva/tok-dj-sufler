@@ -2,7 +2,6 @@ import { fetchPlaylistTracks, fetchPlaylistInfo, fmtTime, extractPlaylistId } fr
 import { createVinylColorPicker } from './js/vinyl-color.js';
 import { attachLongPress } from './js/long-press.js';
 import { saveTracksCache, loadTracksCache, savePlaylistInfoCache, loadPlaylistInfoCache } from './js/track-cache.js';
-import { openContextMenu } from './js/context-menu.js';
 
 if (window.TokEngine) window.TokEngine.init();
 
@@ -22,8 +21,7 @@ let songModalTrack = null;
 let storedOrder = localStorage.getItem('tok_order') || 'sequential';
 if (storedOrder === 'shuffle') storedOrder = 'curated';
 const state = {
-  playing: false, queueOpen: false, armedDir: 'flow', order: storedOrder,
-  locked: false, manualNextIdx: null
+  playing: false, queueOpen: false, armedDir: 'flow', order: storedOrder
 };
 
 const els = {
@@ -72,10 +70,7 @@ const els = {
   dbExport: document.getElementById('tokDbExport'),
   dbImport: document.getElementById('tokDbImport'),
   dbImportFile: document.getElementById('tokDbImportFile'),
-  dbStatus: document.getElementById('tokDbStatus'),
-  lockHint: document.getElementById('tokLockHint'),
-  smartFlow: document.getElementById('tokSmartFlow'),
-  toast: document.getElementById('tokToast')
+  dbStatus: document.getElementById('tokDbStatus')
 };
 
 const applyVinylColor = createVinylColorPicker();
@@ -196,14 +191,13 @@ function renderQueue(){
     const isCurrent = i === currentIndex;
     const dir = !isCurrent ? candidateDirByIdx[i] : null;
     const isCandidate = !!dir;
-    const isQueuedNext = state.manualNextIdx === i;
     const bpm = window.TokEngine ? window.TokEngine.getBPM(t) : null;
-    return '<button class="tok-queue-row' + (isCurrent ? ' current' : '') + (isCandidate ? ' candidate' : '') + (isQueuedNext ? ' queued-next' : '') + '" data-idx="' + i + '">' +
+    return '<button class="tok-queue-row' + (isCurrent ? ' current' : '') + (isCandidate ? ' candidate' : '') + '" data-idx="' + i + '">' +
       '<div class="tok-cover--queue" style="background-image:url(\'' + t.thumb + '\')"></div>' +
       '<div class="tok-queue-meta"><div class="tok-queue-title">' + t.title + '</div>' +
       '<div class="tok-queue-artist">' + t.artist + '</div></div>' +
       (bpm ? '<div class="tok-queue-bpm">' + bpm + ' BPM</div>' : '') +
-      (isQueuedNext ? '<div class="tok-queue-candicon">⏭</div>' : (isCandidate ? '<div class="tok-queue-candicon">' + CANDIDATE_ICON[dir] + '</div>' : '')) +
+      (isCandidate ? '<div class="tok-queue-candicon">' + CANDIDATE_ICON[dir] + '</div>' : '') +
       '<div class="tok-queue-dur">' + fmtTime(t.durationSec) + '</div></button>';
   }).join('');
 }
@@ -298,42 +292,12 @@ els.queue.addEventListener('click', (e) => {
   if (idx !== currentIndex) switchTrack(idx, true);
 });
 
-// ---------- toast feedback ----------
-
-let toastTimer = null;
-function showToast(msg){
-  if (!els.toast) return;
-  els.toast.textContent = msg;
-  els.toast.classList.add('open');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => els.toast.classList.remove('open'), 2200);
-}
-
-// ---------- manual "queue next" override ----------
-
-function queueNext(idx){
-  state.manualNextIdx = idx;
-  if (navigator.vibrate) navigator.vibrate(14);
-  showToast('⏭ ' + tracks[idx].title + ' je sljedeća');
-  renderQueue();
-}
-
-function rowContextItems(idx){
-  return [
-    { label: '✏️ Edit', onSelect: () => openSongModal(idx) },
-    { label: '⏭ Queue Next', onSelect: () => queueNext(idx) }
-  ];
-}
-
-attachLongPress(els.queue, '.tok-queue-row', (row, pos) => {
-  openContextMenu(pos.x, pos.y, rowContextItems(parseInt(row.getAttribute('data-idx'), 10)));
-});
+attachLongPress(els.queue, '.tok-queue-row', (row) => openSongModal(parseInt(row.getAttribute('data-idx'), 10)));
 if (els.vinylWrap) attachLongPress(els.vinylWrap, '.tok-vinyl-wrap', () => openSongModal(currentIndex));
 if (els.nowMeta) attachLongPress(els.nowMeta, '.tok-nowmeta', () => openSongModal(currentIndex));
-attachLongPress(els.dirs, '.tok-dir', (card, pos) => {
+attachLongPress(els.dirs, '.tok-dir', (card) => {
   const dir = card.getAttribute('data-dir');
-  const idx = currentCandidates ? currentCandidates[dir].idx : currentIndex;
-  openContextMenu(pos.x, pos.y, rowContextItems(idx));
+  openSongModal(currentCandidates ? currentCandidates[dir].idx : currentIndex);
 });
 
 // ---------- song edit modal ----------
@@ -408,38 +372,6 @@ function renderDirs(){
     dirBpmEl.textContent = dirBpm ? dirBpm + ' BPM' : '';
     card.classList.toggle('chosen', dir === state.armedDir);
   });
-  renderSmartFlow();
-}
-
-// ---------- smart flow suggestion chips (cute / fire / moon) ----------
-// Maps onto the same real suggestion data as the dir cards (flow→cute/chill,
-// up→fire/energy, down→moon/late-night) instead of fabricating mock tracks.
-
-const SMART_FLOW_DIR = { cute: 'flow', fire: 'up', moon: 'down' };
-
-function renderSmartFlow(){
-  if (!els.smartFlow || !currentCandidates) return;
-  els.smartFlow.querySelectorAll('.tok-smart-chip').forEach(chip => {
-    const type = chip.getAttribute('data-type');
-    const dir = SMART_FLOW_DIR[type];
-    const candidate = currentCandidates[dir];
-    if (!candidate) return;
-    const trackEl = chip.querySelector('.tok-smart-track');
-    if (trackEl) trackEl.textContent = candidate.t.title;
-    chip.dataset.idx = candidate.idx;
-  });
-}
-
-if (els.smartFlow) {
-  els.smartFlow.addEventListener('click', (e) => {
-    const chip = e.target.closest('.tok-smart-chip');
-    if (!chip || chip.dataset.idx == null) return;
-    const idx = parseInt(chip.dataset.idx, 10);
-    queueNext(idx);
-    chip.classList.remove('tok-smart-pop');
-    void chip.offsetWidth;
-    chip.classList.add('tok-smart-pop');
-  });
 }
 
 els.dirs.addEventListener('click', (e) => {
@@ -476,14 +408,8 @@ els.orderToggle.addEventListener('click', () => {
 setOrder(state.order);
 
 function commitEndOfSong(){
-  history.push(tracks[currentIndex]);
-  if (state.manualNextIdx != null) {
-    const idx = state.manualNextIdx;
-    state.manualNextIdx = null;
-    switchTrack(idx, true);
-    return;
-  }
   const picked = currentCandidates[state.armedDir];
+  history.push(tracks[currentIndex]);
   switchTrack(picked.idx, true);
 }
 
@@ -567,21 +493,7 @@ function tapFeedback(btn){
   btn.classList.add('tok-tap');
 }
 
-// ---------- play-button lock (neon security mode) ----------
-
-function setLocked(locked){
-  state.locked = locked;
-  document.querySelector('.tok-app').classList.toggle('transport-locked', locked);
-  if (els.lockHint) els.lockHint.classList.toggle('show', locked);
-  if (navigator.vibrate) navigator.vibrate(locked ? [10, 40, 10] : 18);
-  showToast(locked ? '🔒 Transport zaključan' : '🔓 Transport otključan');
-}
-function toggleLock(){ setLocked(!state.locked); }
-
-attachLongPress(els.playBtn.parentElement, '.tok-playbtn', () => toggleLock());
-
 els.prevBtn.addEventListener('click', () => {
-  if (state.locked) return;
   tapFeedback(els.prevBtn);
   if (history.length) {
     const prevTrack = history.pop();
@@ -591,13 +503,10 @@ els.prevBtn.addEventListener('click', () => {
   }
 });
 els.nextBtn.addEventListener('click', () => {
-  if (state.locked) return;
   tapFeedback(els.nextBtn);
   commitEndOfSong();
 });
 els.playBtn.addEventListener('click', () => {
-  if (els.playBtn.dataset.longPressed === '1') { delete els.playBtn.dataset.longPressed; return; }
-  if (state.locked) { showToast('🔒 Zaključano — pritisni dugo za otključavanje'); return; }
   tapFeedback(els.playBtn);
   if (!player || typeof player.getPlayerState !== 'function') return;
   if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo();

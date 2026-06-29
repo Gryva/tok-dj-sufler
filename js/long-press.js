@@ -24,12 +24,11 @@ export function attachLongPress(container, rowSelector, onLongPress){
     if (!row) return;
     activeRow = row;
     start = { x: e.clientX, y: e.clientY };
-    const pos = { x: e.clientX, y: e.clientY };
     timer = setTimeout(() => {
       if (!activeRow) return;
       activeRow.dataset.longPressed = '1';
       if (navigator.vibrate) navigator.vibrate(16);
-      onLongPress(activeRow, pos);
+      onLongPress(activeRow);
       timer = null;
       activeRow = null;
       start = null;
