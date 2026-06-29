@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TOK">
-<link rel="stylesheet" href="style.css?v=35">
+<link rel="stylesheet" href="style.css?v=36">
 </head>
 <body style="margin:0; background:#16100E; height:100%;">
 
@@ -46,6 +46,34 @@
       <button class="tok-skipbtn" id="tokPrevBtn" aria-label="Prošla pjesma">⏮</button>
       <button class="tok-playbtn" id="tokPlayBtn" aria-label="Pusti / pauziraj">▶</button>
       <button class="tok-skipbtn" id="tokNextBtn" aria-label="Sljedeća pjesma">⏭</button>
+      <div class="tok-lock-hint" id="tokLockHint">🔒 zaključano</div>
+    </div>
+
+    <div class="tok-smart-flow" id="tokSmartFlow">
+      <button class="tok-smart-chip tok-smart-cute" data-type="cute" aria-label="Cute Song — ubaci u queue">
+        <span class="tok-smart-emoji">🌸</span>
+        <span class="tok-smart-text">
+          <span class="tok-smart-label">Cute Song</span>
+          <span class="tok-smart-track"></span>
+        </span>
+        <span class="tok-smart-add">+</span>
+      </button>
+      <button class="tok-smart-chip tok-smart-fire" data-type="fire" aria-label="Fire Song — ubaci u queue">
+        <span class="tok-smart-emoji">🔥</span>
+        <span class="tok-smart-text">
+          <span class="tok-smart-label">Fire Song</span>
+          <span class="tok-smart-track"></span>
+        </span>
+        <span class="tok-smart-add">+</span>
+      </button>
+      <button class="tok-smart-chip tok-smart-moon" data-type="moon" aria-label="Moon Song — ubaci u queue">
+        <span class="tok-smart-emoji">🌙</span>
+        <span class="tok-smart-text">
+          <span class="tok-smart-label">Moon Song</span>
+          <span class="tok-smart-track"></span>
+        </span>
+        <span class="tok-smart-add">+</span>
+      </button>
     </div>
 
     <div class="tok-dirs" id="tokDirs">
@@ -164,9 +192,11 @@
       </div>
     </div>
   </div>
+
+  <div class="tok-toast" id="tokToast"></div>
 </div>
 
-<script src="engine.js?v=35"></script>
-<script type="module" src="app.js?v=35"></script>
+<script src="engine.js?v=36"></script>
+<script type="module" src="app.js?v=36"></script>
 </body>
 </html>
