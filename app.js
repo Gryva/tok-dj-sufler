@@ -2,6 +2,7 @@ import { fetchPlaylistTracks, fetchPlaylistInfo, fmtTime, extractPlaylistId } fr
 import { createVinylColorPicker } from './js/vinyl-color.js';
 import { attachLongPress } from './js/long-press.js';
 import { saveTracksCache, loadTracksCache, savePlaylistInfoCache, loadPlaylistInfoCache } from './js/track-cache.js';
+import { openContextMenu } from './js/context-menu.js';
 
 if (window.TokEngine) window.TokEngine.init();
 
@@ -292,7 +293,13 @@ els.queue.addEventListener('click', (e) => {
   if (idx !== currentIndex) switchTrack(idx, true);
 });
 
-attachLongPress(els.queue, '.tok-queue-row', (row) => openSongModal(parseInt(row.getAttribute('data-idx'), 10)));
+attachLongPress(els.queue, '.tok-queue-row', (row, pos) => {
+  const idx = parseInt(row.getAttribute('data-idx'), 10);
+  openContextMenu(pos.x, pos.y, [
+    { label: '▶️ Pusti sljedeću', onSelect: () => playNext(idx) },
+    { label: '✏️ Detalji pjesme', onSelect: () => openSongModal(idx) }
+  ]);
+});
 if (els.vinylWrap) attachLongPress(els.vinylWrap, '.tok-vinyl-wrap', () => openSongModal(currentIndex));
 if (els.nowMeta) attachLongPress(els.nowMeta, '.tok-nowmeta', () => openSongModal(currentIndex));
 attachLongPress(els.dirs, '.tok-dir', (card) => {
@@ -358,9 +365,7 @@ function pickCandidates(){
   return window.TokEngine.getSuggestions({ tracks, currentIndex, mode: state.order, history });
 }
 
-function renderDirs(){
-  currentCandidates = pickCandidates();
-  state.armedDir = 'flow';
+function updateDirCards(){
   ['up', 'flow', 'down'].forEach(dir => {
     const card = els.dirs.querySelector('[data-dir="' + dir + '"]');
     const t = currentCandidates[dir].t;
@@ -372,6 +377,24 @@ function renderDirs(){
     dirBpmEl.textContent = dirBpm ? dirBpm + ' BPM' : '';
     card.classList.toggle('chosen', dir === state.armedDir);
   });
+}
+
+function renderDirs(){
+  currentCandidates = pickCandidates();
+  state.armedDir = 'flow';
+  updateDirCards();
+}
+
+// Long-press "Play Next" on a queue row: drops that track straight into the
+// middle (flow) choice of the 3-card picker, since that's the slot armed by
+// default and the one commitEndOfSong() falls back to.
+function playNext(idx){
+  if (!currentCandidates) return;
+  currentCandidates.flow = { idx, t: tracks[idx] };
+  state.armedDir = 'flow';
+  updateDirCards();
+  renderQueue();
+  if (navigator.vibrate) navigator.vibrate(14);
 }
 
 els.dirs.addEventListener('click', (e) => {
