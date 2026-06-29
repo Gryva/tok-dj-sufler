@@ -422,6 +422,20 @@ function playNext(idx){
   if (!currentCandidates) return;
   currentCandidates.flow = { idx, t: tracks[idx] };
   state.armedDir = 'flow';
+  // If the chosen track was already in up or down, replace that slot
+  // so there are no duplicates across the three cards.
+  ['up', 'down'].forEach(dir => {
+    if (currentCandidates[dir].idx === idx) {
+      const forbidden = new Set([
+        currentIndex, idx,
+        currentCandidates.up.idx,
+        currentCandidates.down.idx
+      ]);
+      const pool = tracks.map((_, i) => i).filter(i => !forbidden.has(i));
+      const newIdx = pool.length ? pool[Math.floor(Math.random() * pool.length)] : idx;
+      currentCandidates[dir] = { idx: newIdx, t: tracks[newIdx] };
+    }
+  });
   updateDirCards();
   renderQueue();
   closeQueue();
