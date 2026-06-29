@@ -447,13 +447,29 @@ if (els.refreshDirs) {
     if (navigator.vibrate) navigator.vibrate(10);
     // Exclude current candidates so refresh always picks different songs.
     // Preserve armedDir so the user's chosen direction isn't reset.
-    const extraHistory = currentCandidates
-      ? ['up', 'flow', 'down'].map(d => currentCandidates[d].t)
+    const prevCandidates = currentCandidates;
+    const extraHistory = prevCandidates
+      ? ['up', 'flow', 'down'].map(d => prevCandidates[d].t)
       : [];
     currentCandidates = window.TokEngine.getSuggestions({
       tracks, currentIndex, mode: state.order,
       history: [...history, ...extraHistory]
     });
+    // In sequential mode the engine always picks currentIndex+1 for flow,
+    // ignoring history. Force a different pick if it's unchanged.
+    if (prevCandidates && currentCandidates.flow.idx === prevCandidates.flow.idx) {
+      const forbidden = new Set([
+        currentIndex,
+        currentCandidates.up.idx,
+        currentCandidates.down.idx,
+        prevCandidates.flow.idx
+      ]);
+      const pool = tracks.map((_, i) => i).filter(i => !forbidden.has(i));
+      const newIdx = pool.length
+        ? pool[Math.floor(Math.random() * pool.length)]
+        : currentCandidates.flow.idx;
+      currentCandidates.flow = { idx: newIdx, t: tracks[newIdx] };
+    }
     updateDirCards();
     els.refreshDirs.classList.remove('spinning');
     void els.refreshDirs.offsetWidth;
