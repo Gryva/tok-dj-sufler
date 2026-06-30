@@ -59,9 +59,9 @@ function wrapperFor(kind){
   return document.querySelector('.tok-dir-flow-arrows:not(.diag-up):not(.diag-down)');
 }
 
-// Brief "selection pulse": on pick, arrows jump ~15% faster and a bit
-// brighter, then ease back down to the locked-in defaults over ~900ms —
-// a subtle extra cue that the direction just changed.
+// Brief "selection pulse": on pick, arrows jump to ~2.8x speed and ~3x
+// opacity, then ease back down to the locked-in defaults over ~1.75s —
+// a clear extra cue that the direction just changed.
 //
 // Speed is driven via Animation.playbackRate rather than by changing
 // --tok-arrow-speed (animation-duration): CSS animations derive their
@@ -71,9 +71,9 @@ function wrapperFor(kind){
 // fast time advances from wherever the animation currently is, so it
 // speeds up and settles back down without ever reversing.
 const PULSE = {
-  rateFactor: 1 / 0.85,  // how much faster at peak, e.g. 1/0.85 = ~15% faster
-  opacityFactor: 1.4,    // how much brighter at peak, multiplies the default opacity
-  durationMs: 900,
+  rateFactor: 2.8,      // how much faster at peak
+  opacityFactor: 3,     // how much brighter at peak, multiplies the default opacity
+  durationMs: 1750,
 };
 
 function pulse(kind){
@@ -118,59 +118,8 @@ function pulse(kind){
 
 window.tokPulseDirArrows = pulse;
 
-// TEMP DEBUG: lets the selection-pulse strength/duration be tuned live.
-// Remove this block once values are locked in.
-function buildPulseTuner(){
-  const panel = document.createElement('div');
-  panel.style.cssText = 'position:fixed; left:8px; top:8px; z-index:9999; background:rgba(20,20,24,0.92); color:#fff; font:12px/1.4 system-ui,sans-serif; padding:10px 12px; border-radius:10px; width:220px; box-shadow:0 4px 24px rgba(0,0,0,0.4);';
-  panel.innerHTML = `
-    <div style="font-weight:600; margin-bottom:6px;">Pulse tuner (debug)</div>
-    <label style="display:block; margin-bottom:8px;">Peak speed-up (x):
-      <input type="number" id="tokPulseRate" value="${PULSE.rateFactor.toFixed(2)}" step="0.05" style="width:60px; margin-left:4px;"><br>
-      <input type="range" id="tokPulseRateRange" min="1" max="6" step="0.05" value="${PULSE.rateFactor}" style="width:100%;">
-    </label>
-    <label style="display:block; margin-bottom:8px;">Peak opacity (x default):
-      <input type="number" id="tokPulseOpacity" value="${PULSE.opacityFactor.toFixed(2)}" step="0.1" style="width:60px; margin-left:4px;"><br>
-      <input type="range" id="tokPulseOpacityRange" min="1" max="6" step="0.1" value="${PULSE.opacityFactor}" style="width:100%;">
-    </label>
-    <label style="display:block; margin-bottom:10px;">Duration (ms):
-      <input type="number" id="tokPulseDuration" value="${PULSE.durationMs}" step="50" style="width:60px; margin-left:4px;"><br>
-      <input type="range" id="tokPulseDurationRange" min="100" max="5000" step="50" value="${PULSE.durationMs}" style="width:100%;">
-    </label>
-    <div style="display:flex; gap:6px;">
-      <button id="tokPulseTestUp" style="flex:1;">Up</button>
-      <button id="tokPulseTestFlow" style="flex:1;">Flow</button>
-      <button id="tokPulseTestDown" style="flex:1;">Down</button>
-    </div>
-  `;
-  document.body.appendChild(panel);
-
-  function wire(numId, rangeId, key){
-    const num = panel.querySelector('#' + numId);
-    const range = panel.querySelector('#' + rangeId);
-    const sync = (val) => {
-      num.value = val; range.value = val;
-      PULSE[key] = parseFloat(val);
-    };
-    num.addEventListener('input', () => sync(num.value));
-    range.addEventListener('input', () => sync(range.value));
-  }
-  wire('tokPulseRate', 'tokPulseRateRange', 'rateFactor');
-  wire('tokPulseOpacity', 'tokPulseOpacityRange', 'opacityFactor');
-  wire('tokPulseDuration', 'tokPulseDurationRange', 'durationMs');
-
-  function trigger(kind){
-    document.querySelectorAll('.tok-dir').forEach(c => c.classList.toggle('chosen', c.dataset.dir === kind));
-    pulse(kind);
-  }
-  panel.querySelector('#tokPulseTestUp').addEventListener('click', () => trigger('up'));
-  panel.querySelector('#tokPulseTestFlow').addEventListener('click', () => trigger('flow'));
-  panel.querySelector('#tokPulseTestDown').addEventListener('click', () => trigger('down'));
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   buildWrapper(document.querySelector('.tok-dir-flow-arrows.diag-up'), 'up');
   buildWrapper(document.querySelector('.tok-dir-flow-arrows.diag-down'), 'down');
   buildWrapper(document.querySelector('.tok-dir-flow-arrows:not(.diag-up):not(.diag-down)'), 'flow');
-  buildPulseTuner();
 });
