@@ -246,8 +246,8 @@ html, body { height:100%; margin:0; }
 }
 .tok-dir-flow-arrows-track {
   position:absolute; top:50%; left:0; width:max-content;
-  display:flex; align-items:center; gap:26px;
-  transform:translateY(-50%);
+  display:flex; align-items:center;
+  transform:translateY(-50%) translateX(-50%);
   animation: tok-flow-arrows-move 7s linear infinite;
   opacity:0.22;
 }
@@ -255,8 +255,8 @@ html, body { height:100%; margin:0; }
   width:13px; height:13px; flex-shrink:0; color:#E2401D;
 }
 @keyframes tok-flow-arrows-move {
-  from { transform: translateY(-50%) translateX(0); }
-  to   { transform: translateY(-50%) translateX(-50%); }
+  from { transform: translateY(-50%) translateX(-50%); }
+  to   { transform: translateY(-50%) translateX(0%); }
 }
 
 /* "play next" just swapped this card's track in — strong pop + glow so it
