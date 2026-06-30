@@ -346,8 +346,14 @@ els.queue.addEventListener('click', (e) => {
 attachLongPress(els.queue, '.tok-queue-row', (row, pos) => {
   const idx = parseInt(row.getAttribute('data-idx'), 10);
   openContextMenu(pos.x, pos.y, [
-    { label: '▶️ Pusti sljedeću', onSelect: () => playNext(idx) },
-    { label: '✏️ Detalji pjesme', onSelect: () => openSongModal(idx) }
+    {
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>',
+      label: 'Pusti sljedeću', onSelect: () => playNext(idx)
+    },
+    {
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+      label: 'Detalji pjesme', onSelect: () => openSongModal(idx)
+    }
   ]);
 });
 if (els.vinylWrap) attachLongPress(els.vinylWrap, '.tok-vinyl-wrap', () => openSongModal(currentIndex));
@@ -700,8 +706,10 @@ function savePlaylist(){
 attachLongPress(els.playlistInfo, '.tok-playlist-info', (_, pos) => {
   const saved = listPlaylists();
   if (saved.length < 2) return;
+  const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   openContextMenu(pos.x, pos.y, saved.map(p => ({
-    label: (p.id === PLAYLIST_ID ? '✓ ' : '') + (p.title || p.id),
+    icon: p.id === PLAYLIST_ID ? checkIcon : null,
+    label: p.title || p.id,
     onSelect: () => switchPlaylist(p.id)
   })));
 });

@@ -21,8 +21,12 @@ export function openContextMenu(x, y, items){
 
   const menu = document.createElement('div');
   menu.className = 'tok-ctx-menu';
+  const hasIcons = items.some(item => item.icon);
   menu.innerHTML = items.map((item, i) =>
-    '<button class="tok-ctx-item" data-i="' + i + '">' + item.label + '</button>'
+    '<button class="tok-ctx-item" data-i="' + i + '">' +
+      (hasIcons ? '<span class="tok-ctx-icon">' + (item.icon || '') + '</span>' : '') +
+      '<span>' + item.label + '</span>' +
+    '</button>'
   ).join('');
   (document.querySelector('.tok-app') || document.body).appendChild(menu);
   menuEl = menu;
