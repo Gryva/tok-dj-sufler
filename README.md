@@ -55,3 +55,7 @@ Made by **Griva**.
 
 - [Behance](https://www.behance.net/griva_lg)
 - [LinkedIn](https://www.linkedin.com/in/lovro-grivić)
+
+## License
+
+MIT — see [LICENSE](LICENSE). Free to use and modify, just keep the copyright notice.
