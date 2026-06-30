@@ -889,14 +889,17 @@ setInterval(() => {
   document.head.appendChild(tag);
 })();
 
-// ---------- DEBUG-COLOR-PICKER:START (temporary, remove later) ----------
-(function setupDebugColorPicker(){
-  const input = document.getElementById('tokDebugColorInput');
-  const resetBtn = document.getElementById('tokDebugColorReset');
+// ---------- theme color picker ----------
+(function setupColorPicker(){
+  const toggleBtn = document.getElementById('tokColorToggle');
+  const menu = document.getElementById('tokColorMenu');
+  const input = document.getElementById('tokColorInput');
+  const resetBtn = document.getElementById('tokColorReset');
   const appEl = document.querySelector('.tok-app');
-  if (!input || !appEl) return;
+  if (!toggleBtn || !menu || !input || !appEl) return;
   const DEFAULT_DUSK = '#E2401D';
-  const STORAGE_KEY = 'tok_debug_dusk';
+  const STORAGE_KEY = 'tok_theme_dusk';
+
   function apply(color){
     appEl.style.setProperty('--dusk', color);
   }
@@ -905,16 +908,23 @@ setInterval(() => {
     input.value = saved;
     apply(saved);
   }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if (!menu.classList.contains('open')) return;
+    if (e.target === toggleBtn || menu.contains(e.target)) return;
+    menu.classList.remove('open');
+  });
   input.addEventListener('input', () => {
     apply(input.value);
     localStorage.setItem(STORAGE_KEY, input.value);
   });
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      input.value = DEFAULT_DUSK;
-      appEl.style.removeProperty('--dusk');
-      localStorage.removeItem(STORAGE_KEY);
-    });
-  }
+  resetBtn.addEventListener('click', () => {
+    input.value = DEFAULT_DUSK;
+    appEl.style.removeProperty('--dusk');
+    localStorage.removeItem(STORAGE_KEY);
+  });
 })();
-// ---------- DEBUG-COLOR-PICKER:END ----------

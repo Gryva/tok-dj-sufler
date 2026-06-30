@@ -12,21 +12,28 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TOK">
-<link rel="stylesheet" href="style.css?v=74">
+<link rel="stylesheet" href="style.css?v=75">
 </head>
 <body style="margin:0; background:#16100E; height:100%;">
-
-<!-- DEBUG-COLOR-PICKER:START (temporary, remove later) -->
-<div id="tokDebugColorPicker" style="position:fixed; top:max(10px, env(safe-area-inset-top)); right:10px; z-index:9999; display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.55); padding:6px 8px; border-radius:10px; font-family:sans-serif;">
-  <input type="color" id="tokDebugColorInput" value="#E2401D" style="width:34px; height:34px; border:none; padding:0; background:none; cursor:pointer;">
-  <button id="tokDebugColorReset" style="font-size:11px; color:#fff; background:rgba(255,255,255,0.15); border:none; border-radius:6px; padding:6px 8px; cursor:pointer;">Reset</button>
-</div>
-<!-- DEBUG-COLOR-PICKER:END -->
 
 <div class="tok-app">
   <div class="tok-head">
     <div class="tok-wordmark">TOK</div>
     <div class="tok-head-actions">
+      <div class="tok-color-wrap">
+        <button class="tok-yt-link" id="tokColorToggle" aria-label="Boja teme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor"/>
+            <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor"/><circle cx="6.5" cy="12.5" r="0.5" fill="currentColor"/>
+            <path d="M12 22a10 10 0 1 1 9-14.5c.4 1-.2 2-1.3 2H17a2 2 0 0 0-2 2c0 1 .5 1.5.5 2.5A2 2 0 0 1 13.5 16a2 2 0 0 0-1.5 2c0 1.5 1 2.5 1 4 0-.3-1 0-1 0z"/>
+          </svg>
+        </button>
+        <div class="tok-color-menu" id="tokColorMenu">
+          <div class="tok-color-menu-label">Boja teme</div>
+          <input type="color" id="tokColorInput" value="#E2401D">
+          <button class="tok-color-reset" id="tokColorReset">Vrati zadano</button>
+        </div>
+      </div>
       <button class="tok-yt-link" id="tokFullscreenToggle" aria-label="Cijeli zaslon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
@@ -211,7 +218,7 @@
   </div>
 </div>
 
-<script src="engine.js?v=74"></script>
-<script type="module" src="app.js?v=74"></script>
+<script src="engine.js?v=75"></script>
+<script type="module" src="app.js?v=75"></script>
 </body>
 </html>
