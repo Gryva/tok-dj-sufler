@@ -894,25 +894,74 @@ setInterval(() => {
   const toggleBtn = document.getElementById('tokColorToggle');
   const menu = document.getElementById('tokColorMenu');
   const swatchesWrap = document.getElementById('tokColorSwatches');
-  const hexInput = document.getElementById('tokColorHexInput');
+  const customBtn = document.getElementById('tokColorCustomBtn');
+  const customPanel = document.getElementById('tokColorCustomPanel');
+  const slBox = document.getElementById('tokColorSL');
+  const slThumb = document.getElementById('tokColorSLThumb');
+  const hueInput = document.getElementById('tokColorHue');
   const resetBtn = document.getElementById('tokColorReset');
   const appEl = document.querySelector('.tok-app');
-  if (!toggleBtn || !menu || !swatchesWrap || !hexInput || !appEl) return;
+  if (!toggleBtn || !menu || !swatchesWrap || !customBtn || !customPanel || !slBox || !slThumb || !hueInput || !appEl) return;
   const DEFAULT_DUSK = '#E2401D';
   const STORAGE_KEY = 'tok_theme_dusk';
-  const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+
+  function hexToHsv(hex){
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+    let h = 0;
+    if (d !== 0) {
+      if (max === r) h = ((g - b) / d) % 6;
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    const s = max === 0 ? 0 : d / max;
+    const v = max;
+    return { h, s, v };
+  }
+  function hsvToHex(h, s, v){
+    const c = v * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = v - c;
+    let r, g, b;
+    if (h < 60) [r, g, b] = [c, x, 0];
+    else if (h < 120) [r, g, b] = [x, c, 0];
+    else if (h < 180) [r, g, b] = [0, c, x];
+    else if (h < 240) [r, g, b] = [0, x, c];
+    else if (h < 300) [r, g, b] = [x, 0, c];
+    else [r, g, b] = [c, 0, x];
+    const toHex = (n) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
+    return '#' + toHex(r) + toHex(g) + toHex(b);
+  }
+
+  let hsv = hexToHsv(DEFAULT_DUSK);
 
   function markActiveSwatch(color){
-    swatchesWrap.querySelectorAll('.tok-color-swatch').forEach(sw => {
-      sw.classList.toggle('active', sw.dataset.color.toLowerCase() === color.toLowerCase());
+    let matched = false;
+    swatchesWrap.querySelectorAll('.tok-color-swatch[data-color]').forEach(sw => {
+      const isMatch = sw.dataset.color.toLowerCase() === color.toLowerCase();
+      sw.classList.toggle('active', isMatch);
+      if (isMatch) matched = true;
     });
+    customBtn.classList.toggle('active', !matched);
+  }
+  function positionThumb(){
+    slThumb.style.left = (hsv.s * 100) + '%';
+    slThumb.style.top = ((1 - hsv.v) * 100) + '%';
+  }
+  function syncCustomPanelToHue(){
+    hueInput.value = hsv.h;
+    slBox.style.backgroundColor = 'hsl(' + hsv.h + ', 100%, 50%)';
+    positionThumb();
   }
   function apply(color){
     appEl.style.setProperty('--dusk', color);
-    hexInput.value = color.toUpperCase();
     markActiveSwatch(color);
   }
   const saved = localStorage.getItem(STORAGE_KEY);
+  hsv = hexToHsv(saved || DEFAULT_DUSK);
+  syncCustomPanelToHue();
   apply(saved || DEFAULT_DUSK);
 
   toggleBtn.addEventListener('click', (e) => {
@@ -925,19 +974,50 @@ setInterval(() => {
     menu.classList.remove('open');
   });
   swatchesWrap.addEventListener('click', (e) => {
-    const sw = e.target.closest('.tok-color-swatch');
+    const sw = e.target.closest('.tok-color-swatch[data-color]');
     if (!sw) return;
+    hsv = hexToHsv(sw.dataset.color);
+    syncCustomPanelToHue();
     apply(sw.dataset.color);
     localStorage.setItem(STORAGE_KEY, sw.dataset.color);
   });
-  hexInput.addEventListener('input', () => {
-    const val = hexInput.value.trim();
-    if (!HEX_RE.test(val)) return;
-    appEl.style.setProperty('--dusk', val);
-    markActiveSwatch(val);
-    localStorage.setItem(STORAGE_KEY, val);
+  customBtn.addEventListener('click', () => {
+    customPanel.classList.toggle('open');
   });
+
+  let dragging = false;
+  function updateFromPointer(e){
+    const rect = slBox.getBoundingClientRect();
+    const x = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+    const y = Math.min(Math.max(e.clientY - rect.top, 0), rect.height);
+    hsv.s = rect.width ? x / rect.width : 0;
+    hsv.v = rect.height ? 1 - y / rect.height : 0;
+    positionThumb();
+    const hex = hsvToHex(hsv.h, hsv.s, hsv.v);
+    apply(hex);
+    localStorage.setItem(STORAGE_KEY, hex);
+  }
+  slBox.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    slBox.setPointerCapture(e.pointerId);
+    updateFromPointer(e);
+  });
+  slBox.addEventListener('pointermove', (e) => {
+    if (dragging) updateFromPointer(e);
+  });
+  ['pointerup', 'pointercancel'].forEach(evt => slBox.addEventListener(evt, () => { dragging = false; }));
+
+  hueInput.addEventListener('input', () => {
+    hsv.h = Number(hueInput.value);
+    slBox.style.backgroundColor = 'hsl(' + hsv.h + ', 100%, 50%)';
+    const hex = hsvToHex(hsv.h, hsv.s, hsv.v);
+    apply(hex);
+    localStorage.setItem(STORAGE_KEY, hex);
+  });
+
   resetBtn.addEventListener('click', () => {
+    hsv = hexToHsv(DEFAULT_DUSK);
+    syncCustomPanelToHue();
     apply(DEFAULT_DUSK);
     localStorage.removeItem(STORAGE_KEY);
   });
