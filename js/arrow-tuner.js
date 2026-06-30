@@ -38,7 +38,7 @@ function buildRowHTML(kind){
 function rebuildWrapper(wrapper, kind){
   if (!wrapper) return;
   wrapper.innerHTML = '';
-  const rows = kind === 'flow' ? 1 : params.rows;
+  const rows = params.rows;
   const half = params.spread / 2;
   for (let r = 0; r < rows; r++){
     const top = rows === 1 ? 50 : 50 - half + (half * 2 * r) / (rows - 1);
