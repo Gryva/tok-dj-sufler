@@ -948,8 +948,14 @@ setInterval(() => {
     slBox.style.backgroundColor = 'hsl(' + hsv.h + ', 100%, 50%)';
     positionThumb();
   }
+  function readableTextFor(hex){
+    const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.6 ? '#16100E' : '#FBF1E7';
+  }
   function apply(color){
     appEl.style.setProperty('--dusk', color);
+    appEl.style.setProperty('--ctx-text', readableTextFor(color));
     markActiveSwatch(color);
     hexInput.value = color.toUpperCase();
   }
