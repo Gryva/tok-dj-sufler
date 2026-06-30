@@ -261,6 +261,13 @@ html, body { height:100%; margin:0; }
   animation: tok-flow-arrows-move var(--tok-arrow-speed, 7s) linear infinite;
   opacity:var(--tok-arrow-opacity, 0.22);
 }
+/* Only the active (chosen) card's tracks get promoted to their own GPU
+   compositor layer. Scoping will-change to .chosen instead of applying it
+   to every track up front avoids holding ~60+ idle layers in GPU memory
+   for the two cards that aren't currently animating. */
+.tok-dir.chosen .tok-dir-flow-arrows-track {
+  will-change: transform, opacity;
+}
 .tok-dir-flow-arrows-track svg {
   width:var(--tok-arrow-size, 13px); height:var(--tok-arrow-size, 13px); flex-shrink:0; color:var(--dusk);
 }
@@ -279,6 +286,12 @@ html, body { height:100%; margin:0; }
 .tok-dir.chosen .tok-dir-flow-arrows .tok-dir-flow-arrows-track {
   animation-play-state: running;
   opacity: var(--tok-arrow-opacity, 0.22);
+}
+/* Backgrounded tab: stop the otherwise-infinite arrow animation outright
+   instead of letting it keep ticking (and compositing) off-screen. Toggled
+   by the visibilitychange listener in js/dir-arrows.js. */
+html.tok-bg-paused .tok-dir-flow-arrows-track {
+  animation-play-state: paused !important;
 }
 
 /* "play next" just swapped this card's track in — strong pop + glow so it
@@ -492,4 +505,5 @@ html, body { height:100%; margin:0; }
 
 @media (prefers-reduced-motion: reduce) {
   .tok-vinyl-cover, .tok-vinyl-wrap::before, .tok-sheet, .tok-backdrop { animation:none !important; transition:none !important; }
+  .tok-dir-flow-arrows-track { animation:none !important; will-change:auto !important; }
 }

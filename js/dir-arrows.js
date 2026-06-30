@@ -76,7 +76,10 @@ const PULSE = {
   durationMs: 1750,
 };
 
+const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function pulse(kind){
+  if (prefersReducedMotion) return;
   const wrapper = wrapperFor(kind);
   if (!wrapper) return;
   const p = PARAMS[kind];
@@ -117,6 +120,13 @@ function pulse(kind){
 }
 
 window.tokPulseDirArrows = pulse;
+
+// Backgrounded tab: an infinite CSS animation otherwise keeps ticking (and
+// the compositor keeps re-rendering it) even when nothing is visible,
+// which costs battery for zero benefit. Pause it outright while hidden.
+document.addEventListener('visibilitychange', () => {
+  document.documentElement.classList.toggle('tok-bg-paused', document.hidden);
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   buildWrapper(document.querySelector('.tok-dir-flow-arrows.diag-up'), 'up');
