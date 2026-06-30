@@ -78,6 +78,13 @@ const PULSE = {
 
 const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Tracks the active pulse "generation" per direction so that re-triggering a
+// pulse (e.g. clicking the same card again before the previous pulse has
+// eased out) cancels the in-flight one instead of running two rAF loops in
+// parallel — two loops fighting over the same playbackRate/opacity produced
+// a visible jump/stagger partway through the animation.
+const pulseGen = { up: 0, down: 0, flow: 0 };
+
 function pulse(kind){
   if (prefersReducedMotion) return;
   const wrapper = wrapperFor(kind);
@@ -90,6 +97,7 @@ function pulse(kind){
 
   const anims = Array.from(tracks).flatMap(track => track.getAnimations());
   const peakOpacity = Math.min(p.opacity * PULSE.opacityFactor, 1);
+  const gen = ++pulseGen[kind];
 
   // A card that's just been switched from paused to running has a *pending*
   // animation: its start time isn't committed yet. Writing playbackRate
@@ -97,11 +105,13 @@ function pulse(kind){
   // time, so the animation never actually commits and looks frozen. Wait
   // for it to actually start before driving playbackRate.
   Promise.all(anims.map(anim => anim.ready)).then(() => {
+    if (gen !== pulseGen[kind]) return;
     const start = performance.now();
     const duration = PULSE.durationMs;
     const rateFactor = PULSE.rateFactor;
 
     function step(now){
+      if (gen !== pulseGen[kind]) return;
       const t = Math.min((now - start) / duration, 1);
       const ease = 1 - Math.pow(1 - t, 3);
       const rate = rateFactor + (1 - rateFactor) * ease;
