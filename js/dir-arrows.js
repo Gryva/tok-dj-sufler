@@ -40,12 +40,15 @@ function buildWrapper(wrapper, kind){
   const half = p.spread / 2;
   for (let r = 0; r < rows; r++){
     const top = rows === 1 ? 50 : 50 - half + (half * 2 * r) / (rows - 1);
+    const row = document.createElement('div');
+    row.className = 'tok-dir-flow-arrows-row';
+    row.style.top = top + '%';
     const track = document.createElement('div');
     track.className = 'tok-dir-flow-arrows-track';
-    track.style.top = top + '%';
     track.style.animationDelay = (-r * p.speed / Math.max(rows, 1)).toFixed(2) + 's';
     track.innerHTML = buildRowHTML(kind, p);
-    wrapper.appendChild(track);
+    row.appendChild(track);
+    wrapper.appendChild(row);
   }
 }
 

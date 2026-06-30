@@ -244,8 +244,18 @@ html, body { height:100%; margin:0; }
 .tok-dir-flow-arrows {
   position:absolute; inset:0; overflow:hidden; pointer-events:none; border-radius:inherit;
 }
+/* Zero-size pivot, one per row: positioned at the row's vertical offset on
+   the card's own centerline, then rotated. Because it has no size, the
+   rotation pivots exactly on that point instead of on the (much wider)
+   scrolling content's own center, which is what previously skewed the
+   diagonal arrows toward one side of the card. */
+.tok-dir-flow-arrows-row {
+  position:absolute; left:50%; top:50%; width:0; height:0;
+}
+.tok-dir-flow-arrows.diag-up .tok-dir-flow-arrows-row { transform: rotate(-45deg); }
+.tok-dir-flow-arrows.diag-down .tok-dir-flow-arrows-row { transform: rotate(45deg); }
 .tok-dir-flow-arrows-track {
-  position:absolute; top:50%; left:0; width:max-content;
+  position:absolute; top:0; left:0; width:max-content;
   display:flex; align-items:center;
   transform:translateY(-50%) translateX(-50%);
   animation: tok-flow-arrows-move var(--tok-arrow-speed, 7s) linear infinite;
@@ -272,22 +282,6 @@ html, body { height:100%; margin:0; }
 .tok-dir.chosen .tok-dir-flow-arrows.diag-down .tok-dir-flow-arrows-track {
   animation-play-state: running;
   opacity: var(--tok-arrow-opacity, 0.22);
-}
-.tok-dir-flow-arrows.diag-up .tok-dir-flow-arrows-track {
-  transform: translateY(-50%) rotate(-45deg) translateX(-50%);
-  animation-name: tok-flow-arrows-move-diag-up;
-}
-.tok-dir-flow-arrows.diag-down .tok-dir-flow-arrows-track {
-  transform: translateY(-50%) rotate(45deg) translateX(-50%);
-  animation-name: tok-flow-arrows-move-diag-down;
-}
-@keyframes tok-flow-arrows-move-diag-up {
-  from { transform: translateY(-50%) rotate(-45deg) translateX(-50%); }
-  to   { transform: translateY(-50%) rotate(-45deg) translateX(0%); }
-}
-@keyframes tok-flow-arrows-move-diag-down {
-  from { transform: translateY(-50%) rotate(45deg) translateX(-50%); }
-  to   { transform: translateY(-50%) rotate(45deg) translateX(0%); }
 }
 
 /* "play next" just swapped this card's track in — strong pop + glow so it
