@@ -3,7 +3,7 @@
 html, body { height:100%; margin:0; }
 
 .tok-app {
-  --bg: #16100E;
+  --bg: #000000;
   --stage: #241914;
   --sheet: #2E1F19;
   --ink: #FBF1E7;
@@ -27,7 +27,10 @@ html, body { height:100%; margin:0; }
 .tok-app * { box-sizing: border-box; }
 
 .tok-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
-.tok-wordmark { font-family:'Fraunces',serif; font-weight:900; font-size:24px; letter-spacing:0.2px; }
+.tok-wordmark {
+  font-family:'Fraunces',serif; font-weight:900; font-size:24px; letter-spacing:0.2px;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation;
+}
 .tok-head-actions { display:flex; align-items:center; gap:8px; }
 .tok-yt-link {
   display:flex; align-items:center; justify-content:center;
@@ -36,6 +39,68 @@ html, body { height:100%; margin:0; }
   font-family:inherit; opacity:0.55; transition: opacity 0.2s, background 0.2s;
 }
 .tok-yt-link.active { opacity:1; background:var(--gold); color:var(--bg); }
+.tok-yt-link svg { width:16px; height:16px; }
+
+.tok-color-wrap { position:relative; }
+.tok-color-menu {
+  position:absolute; top:42px; right:0; z-index:50;
+  display:none; flex-direction:column; align-items:stretch; gap:10px;
+  background:var(--sheet); border-radius:18px; padding:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4); min-width:190px;
+}
+.tok-color-menu.open { display:flex; }
+.tok-color-menu-label { font-family:'Fraunces',serif; font-weight:700; font-size:14px; }
+.tok-color-swatches { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
+.tok-color-swatch {
+  width:100%; aspect-ratio:1; border-radius:10px; cursor:pointer;
+  border:2px solid rgba(255,255,255,0.12); padding:0; box-shadow:0 2px 4px rgba(0,0,0,0.25);
+}
+.tok-color-swatch:active { transform:scale(0.92); }
+.tok-color-swatch.active { border-color:var(--ink); box-shadow:0 0 0 2px var(--sheet), 0 0 0 4px var(--ink); }
+.tok-color-custom {
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,0.06); color:var(--muted);
+  border-style:dashed;
+}
+.tok-color-custom svg { width:16px; height:16px; }
+.tok-color-custom.active { border-color:var(--ink); box-shadow:0 0 0 2px var(--sheet), 0 0 0 4px var(--ink); }
+
+.tok-color-custom-panel { display:none; flex-direction:column; gap:10px; }
+.tok-color-custom-panel.open { display:flex; }
+.tok-color-sl {
+  position:relative; width:100%; height:120px; border-radius:12px; cursor:pointer;
+  background-image: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent);
+  background-color: hsl(9, 100%, 50%);
+  touch-action:none; overflow:hidden;
+}
+.tok-color-sl-thumb {
+  position:absolute; width:16px; height:16px; border-radius:50%;
+  border:2px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,0.45);
+  transform:translate(-50%, -50%); pointer-events:none;
+}
+.tok-color-hue {
+  -webkit-appearance:none; appearance:none; width:100%; height:14px; border-radius:999px;
+  background:linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red); outline:none;
+}
+.tok-color-hue::-webkit-slider-thumb {
+  -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+  background:#fff; border:2px solid rgba(0,0,0,0.35); cursor:pointer;
+}
+.tok-color-hue::-moz-range-thumb {
+  width:18px; height:18px; border-radius:50%; background:#fff; border:2px solid rgba(0,0,0,0.35); cursor:pointer;
+}
+.tok-color-hex {
+  width:100%; box-sizing:border-box; border:none; border-radius:12px; padding:9px 12px;
+  background:rgba(255,255,255,0.06); color:var(--ink); font-family:'JetBrains Mono',monospace;
+  font-size:13px; text-transform:uppercase; outline:none;
+}
+.tok-color-hex:focus { box-shadow:0 0 0 1.5px var(--dusk); }
+.tok-color-reset {
+  border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:13px;
+  border-radius:999px; padding:8px 14px; background:transparent; color:var(--muted);
+}
+.tok-color-reset:active { transform:scale(0.96); }
+#tokFullscreenToggle.active { opacity:1; background:var(--dusk); color:var(--ink); }
 
 .tok-main {
   flex: 1;
@@ -49,7 +114,23 @@ html, body { height:100%; margin:0; }
 }
 
 /* ---------- vinyl ---------- */
-.tok-vinyl-wrap { position:relative; width: min(48vw, 210px); aspect-ratio: 1; flex-shrink: 0; }
+@keyframes tok-vinyl-glow {
+  0%, 100% { transform: translate(-50%,-50%) scale(1);    opacity: 0.75; }
+  50%       { transform: translate(-50%,-50%) scale(1.4); opacity: 0.44; }
+}
+.tok-vinyl-wrap {
+  position:relative; width: min(48vw, 210px); aspect-ratio: 1; flex-shrink: 0;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation;
+}
+.tok-vinyl-wrap::before {
+  content:''; position:absolute; z-index:0;
+  top:50%; left:50%;
+  width:113%; height:113%;
+  border-radius:50%;
+  background: radial-gradient(circle, var(--dusk) 0%, transparent 65%);
+  animation: tok-vinyl-glow 4.5s ease-in-out infinite;
+  pointer-events:none;
+}
 
 /* cover art sits behind the ring and spins on its own */
 .tok-vinyl-cover {
@@ -71,7 +152,7 @@ html, body { height:100%; margin:0; }
   position:absolute; inset:0; border-radius:50%; z-index:2; pointer-events:none;
   background:
     repeating-radial-gradient(circle farthest-side, rgba(0,0,0,0.45) 0px, rgba(0,0,0,0.45) 1px, rgba(255,255,255,0.14) 1px, rgba(255,255,255,0.14) 2px, transparent 2px, transparent 6px),
-    var(--vinyl-color, conic-gradient(from 0deg, #FF5A3C, #FFC857, #E2401D, #F0883E, #FF5A3C));
+    var(--dusk);
   box-shadow: 0 22px 50px rgba(0,0,0,0.55);
   -webkit-mask-image: radial-gradient(circle farthest-side, transparent 0 31%, black 33% 100%);
   mask-image: radial-gradient(circle farthest-side, transparent 0 31%, black 33% 100%);
@@ -83,36 +164,161 @@ html, body { height:100%; margin:0; }
 @keyframes tok-spin { to { transform: rotate(360deg); } }
 
 
-.tok-nowmeta { text-align:center; width:100%; max-width: 420px; }
-.tok-now-title { font-family:'Fraunces',serif; font-weight:700; font-size:19px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tok-nowmeta {
+  text-align:center; width:100%; max-width: 420px;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation;
+}
+.tok-now-title { font-family:'Fraunces',serif; font-weight:700; font-size:16px; line-height:1.3; white-space:normal; overflow-wrap:break-word; }
 .tok-now-artist { color:var(--muted); font-size:13.5px; margin-top:4px; }
 
 /* ---------- soundwave progress ---------- */
-.tok-wave { display:flex; align-items:center; gap:3px; margin-top:8px; width:100%; max-width:320px; height:24px; cursor:pointer; }
-.tok-wave-bar { flex:1; min-width:2px; border-radius:3px; background:rgba(255,255,255,0.14); transition: background 0.2s; }
-.tok-wave-bar.played { background: var(--wave-accent, var(--gold)); }
-
-/* ---------- transport ---------- */
-/* ---------- direction picker ---------- */
-.tok-dirs { display:flex; flex-direction:column; gap:10px; width:100%; max-width:420px; margin-top:10px; }
-.tok-dir {
-  border:none; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
-  background: var(--stage); border-radius:16px; padding:10px 14px; display:flex; align-items:center; gap:12px;
-  opacity:0.55; transition: opacity 0.2s, background 0.2s, transform 0.2s;
+@keyframes tok-wave-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50%       { transform: scaleY(var(--wave-min, 0.3)); }
 }
-.tok-dir:active { transform:scale(0.98); }
-.tok-dir.chosen { opacity:1; background:var(--dusk); }
+
+.tok-wave { display:flex; align-items:center; gap:3px; margin-top:8px; width:100%; max-width:320px; height:24px; cursor:pointer; }
+.tok-wave-bar {
+  flex:1; min-width:2px; border-radius:3px;
+  background: rgba(255,255,255,0.14);
+  transition: background 0.2s;
+  transform-origin: center;
+  animation: tok-wave-breathe var(--dur, 1.8s) ease-in-out infinite var(--delay, 0s);
+}
+.tok-wave-bar.played { background: var(--dusk); }
+
+.tok-wave-mini { display:flex; align-items:center; justify-content:center; gap:2px; height:14px; flex:1; min-width:18px; }
+.tok-wave-mini-bar {
+  width:2px; height:100%; border-radius:2px;
+  background: var(--dusk);
+  transform-origin: center;
+  animation: tok-wave-breathe var(--dur, 1.4s) ease-in-out infinite var(--delay, 0s);
+}
+
+/* ---------- direction picker ---------- */
+@keyframes tok-refresh-spin { to { transform: rotate(360deg); } }
+@keyframes tok-dir-refresh {
+  0%   { transform: translateY(0); }
+  40%  { transform: translateY(5px); }
+  100% { transform: translateY(0); }
+}
+
+.tok-dir.refreshing { animation: tok-dir-refresh 0.3s ease both; }
+
+.tok-dirs-wrap { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; max-width:420px; margin-top:10px; }
+.tok-dirs { display:flex; flex-direction:column; gap:10px; width:100%; }
+.tok-refresh-dirs {
+  border:none; cursor:pointer; background:transparent;
+  color:var(--muted); padding:7px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  transition: color 0.15s, background 0.15s;
+}
+.tok-refresh-dirs svg { width:19px; height:19px; }
+.tok-refresh-dirs:active { color:var(--ink); background:rgba(255,255,255,0.08); }
+.tok-refresh-dirs.spinning svg { animation: tok-refresh-spin 0.45s ease-out; }
+.tok-dirs-actions { display:flex; align-items:center; gap:8px; }
+#tokQueueToggle.tok-refresh-dirs { font-size:17px; line-height:1; }
+.tok-dir {
+  position:relative; box-sizing:border-box;
+  border:2px solid transparent; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
+  background: var(--stage); border-radius:16px; padding:10px 14px; display:flex; align-items:center; gap:12px;
+  opacity:0.55;
+  transition: opacity 0.2s, background 0.45s ease-out, border-color 0.3s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation;
+}
+.tok-dir:active { transform:scale(0.96); transition: transform 0.08s ease-out; }
+.tok-dir.chosen { opacity:1; background:var(--stage); border-color:var(--dusk); }
 .tok-dir-cover { width:40px; height:40px; border-radius:12px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--sheet); }
 .tok-dir-meta { flex:1; min-width:0; }
 .tok-dir-track { font-family:'Fraunces',serif; font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .tok-dir-artist { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
-.tok-dir.chosen .tok-dir-artist { color:rgba(255,255,255,0.75); }
-.tok-dir-bpm { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); opacity:0.65; margin-top:2px; }
-.tok-dir.chosen .tok-dir-bpm { color:rgba(255,255,255,0.6); }
+.tok-dir-bpm { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); opacity:0.65; margin-top:2px; min-height:14px; }
 .tok-dir-icon { flex-shrink:0; color:var(--muted); display:flex; }
 .tok-dir-icon svg { width:19px; height:19px; }
-.tok-dir.chosen .tok-dir-icon { color:#fff; }
+.tok-dir.chosen .tok-dir-icon { color:var(--dusk); }
+.tok-dir.chosen .tok-dir-icon svg { fill:currentColor; stroke:none; }
+.tok-dir[data-dir="flow"].chosen .tok-dir-icon svg { fill:none; stroke:currentColor; stroke-width:2.6; }
 
+.tok-dir { overflow:hidden; }
+.tok-dir-flow-arrows {
+  position:absolute; inset:0; overflow:hidden; pointer-events:none; border-radius:inherit;
+}
+/* Zero-size pivot, one per row: positioned at the row's vertical offset on
+   the card's own centerline, then rotated. Because it has no size, the
+   rotation pivots exactly on that point instead of on the (much wider)
+   scrolling content's own center, which is what previously skewed the
+   diagonal arrows toward one side of the card. */
+.tok-dir-flow-arrows-row {
+  position:absolute; left:50%; top:50%; width:0; height:0;
+}
+.tok-dir-flow-arrows.diag-up .tok-dir-flow-arrows-row { transform: rotate(-45deg); }
+.tok-dir-flow-arrows.diag-down .tok-dir-flow-arrows-row { transform: rotate(45deg); }
+.tok-dir-flow-arrows-track {
+  position:absolute; top:0; left:0; width:max-content;
+  display:flex; align-items:center;
+  transform:translateY(-50%) translateX(-50%);
+  animation: tok-flow-arrows-move var(--tok-arrow-speed, 7s) linear infinite;
+  opacity:var(--tok-arrow-opacity, 0.22);
+}
+/* Only the active (chosen) card's tracks get promoted to their own GPU
+   compositor layer. Scoping will-change to .chosen instead of applying it
+   to every track up front avoids holding ~60+ idle layers in GPU memory
+   for the two cards that aren't currently animating. */
+.tok-dir.chosen .tok-dir-flow-arrows-track {
+  will-change: transform, opacity;
+}
+.tok-dir-flow-arrows-track svg {
+  width:var(--tok-arrow-size, 13px); height:var(--tok-arrow-size, 13px); flex-shrink:0; color:var(--dusk);
+}
+@keyframes tok-flow-arrows-move {
+  from { transform: translateY(-50%) translateX(-50%); }
+  to   { transform: translateY(-50%) translateX(0%); }
+}
+
+/* Every direction card's arrow drift only plays once that card is the
+   chosen direction — i.e. once the user has tapped it. */
+.tok-dir-flow-arrows .tok-dir-flow-arrows-track {
+  animation-play-state: paused;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.tok-dir.chosen .tok-dir-flow-arrows .tok-dir-flow-arrows-track {
+  animation-play-state: running;
+  opacity: var(--tok-arrow-opacity, 0.22);
+}
+/* Backgrounded tab: stop the otherwise-infinite arrow animation outright
+   instead of letting it keep ticking (and compositing) off-screen. Toggled
+   by the visibilitychange listener in js/dir-arrows.js. */
+html.tok-bg-paused .tok-dir-flow-arrows-track {
+  animation-play-state: paused !important;
+}
+
+/* "play next" just swapped this card's track in — strong pop + glow so it
+   reads as a deliberate replacement rather than the usual suggestion refresh. */
+.tok-dir-replaced { animation: tok-dir-replaced-pulse 1.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1; }
+@keyframes tok-dir-replaced-pulse {
+  0% { transform: scale(1); outline: 3px solid #FFC857; outline-offset: 0; box-shadow: 0 0 0 rgba(226,64,29,0); }
+  18% { transform: scale(1.07); outline: 3px solid #FFC857; outline-offset: 1px; box-shadow: 0 0 32px rgba(226,64,29,0.9); }
+  55% { transform: scale(1.02); outline: 2px solid #FFC857; outline-offset: 0; box-shadow: 0 0 24px rgba(226,64,29,0.6); }
+  100% { transform: scale(1); outline: 0px solid transparent; outline-offset: 0; box-shadow: 0 0 0 rgba(226,64,29,0); }
+}
+.tok-dir-replaced::after {
+  content: '✓ Queued next';
+  position: absolute; top: 6px; right: 10px;
+  background: #FFC857; color: #2A1A0E; font-size: 10px; font-weight: 800;
+  padding: 3px 8px; border-radius: 999px; letter-spacing: 0.02em;
+  z-index: 2;
+  animation: tok-dir-replaced-badge 1.3s ease forwards;
+}
+@keyframes tok-dir-replaced-badge {
+  0% { opacity: 0; transform: translateY(4px) scale(0.8); }
+  15% { opacity: 1; transform: translateY(0) scale(1); }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---------- transport ---------- */
 .tok-transport {
   display:flex; align-items:center; justify-content:center; gap:16px;
   background: transparent; border-radius:999px; padding:9px 16px; margin-top:4px;
@@ -121,24 +327,33 @@ html, body { height:100%; margin:0; }
   border:none; cursor:pointer; color:var(--bg); font-family:inherit;
   display:flex; align-items:center; justify-content:center; background:transparent;
 }
-.tok-transport .tok-skipbtn { width:38px; height:38px; border-radius:50%; font-size:15px; color: var(--dusk); background:transparent; transition: transform 0.12s ease, background 0.12s ease; }
+.tok-transport .tok-skipbtn { width:44px; height:44px; border-radius:50%; font-size:17px; color: var(--dusk); background:transparent; transition: transform 0.12s ease, background 0.12s ease; }
 .tok-skipbtn:active { transform:scale(0.88); background:rgba(255,90,60,0.14); }
-.tok-transport .tok-playbtn { width:50px; height:50px; border-radius:50%; background:transparent; color: var(--dusk); font-size:18px; transition: transform 0.12s ease, background 0.12s ease; }
+.tok-transport .tok-playbtn { width:58px; height:58px; border-radius:50%; background:transparent; color: var(--dusk); font-size:21px; transition: transform 0.12s ease, background 0.12s ease; }
 .tok-playbtn:active { transform:scale(0.9); background:rgba(255,90,60,0.14); }
-
-.tok-transport .tok-crossfade-btn {
-  width:34px; height:34px; border-radius:50%; font-size:14px; color:var(--muted);
-  background:transparent; opacity:0.55; margin-left:2px;
-  transition: transform 0.12s ease, background 0.12s ease, opacity 0.2s, color 0.2s;
-}
-.tok-crossfade-btn:active { transform:scale(0.88); }
-.tok-crossfade-btn.active { opacity:1; color:var(--gold); background:rgba(255,200,87,0.14); }
 
 .tok-skipbtn.tok-tap, .tok-playbtn.tok-tap { animation: tok-tap-pulse 0.28s ease-out; }
 @keyframes tok-tap-pulse {
   0% { transform:scale(0.86); background:rgba(255,90,60,0.22); }
   100% { transform:scale(1); background:transparent; }
 }
+
+/* ---------- context menu (long-press) ---------- */
+.tok-ctx-menu {
+  position:fixed; z-index:50; background:var(--dusk); border-radius:14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow:hidden;
+  opacity:0; transform:scale(0.92); transition: opacity 0.15s ease, transform 0.15s ease;
+  min-width:180px;
+}
+.tok-ctx-menu.open { opacity:1; transform:scale(1); }
+.tok-ctx-item {
+  display:flex; align-items:center; gap:10px; width:100%; border:none; background:transparent; color:var(--ctx-text, #fff);
+  font-family:inherit; font-size:14px; font-weight:600; text-align:left; padding:12px 16px; cursor:pointer;
+}
+.tok-ctx-item:not(:last-child) { border-bottom:1px solid rgba(0,0,0,0.18); }
+.tok-ctx-item:active { background:rgba(0,0,0,0.18); }
+.tok-ctx-icon { display:flex; flex-shrink:0; width:16px; height:16px; color:var(--ctx-text, #fff); }
+.tok-ctx-icon svg { width:100%; height:100%; stroke:var(--ctx-text, #fff); fill:none; }
 
 /* ---------- queue sheet ---------- */
 .tok-backdrop {
@@ -177,11 +392,15 @@ html, body { height:100%; margin:0; }
 .tok-playlist-cover {
   width:46px; height:46px; border-radius:12px; flex-shrink:0;
   display:flex; align-items:center; justify-content:center;
-  background:var(--dusk); color:var(--ink);
+  background:var(--dusk) center/cover no-repeat; color:var(--ink);
   font-family:'Fraunces',serif; font-weight:900; font-size:18px;
+  user-select:none; -webkit-user-select:none;
 }
 .tok-playlist-meta { flex:1; min-width:0; }
-.tok-playlist-name { font-family:'Fraunces',serif; font-weight:700; font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tok-playlist-name {
+  font-family:'Fraunces',serif; font-weight:700; font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  user-select:none; -webkit-user-select:none;
+}
 .tok-playlist-sub { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
 
 .tok-queue-search {
@@ -191,6 +410,21 @@ html, body { height:100%; margin:0; }
 }
 .tok-queue-search::placeholder { color:var(--muted); }
 .tok-queue-search:focus { border-color:var(--dusk); }
+
+.tok-db-drawer {
+  display:grid; grid-template-rows:0fr; overflow:hidden;
+  transition:grid-template-rows 0.25s ease; flex-shrink:0;
+}
+.tok-db-drawer.open { grid-template-rows:1fr; }
+.tok-db-drawer-inner { overflow:hidden; }
+.tok-db-actions { display:flex; gap:8px; margin:0 0 6px; flex-shrink:0; }
+.tok-db-btn {
+  flex:1; border:none; cursor:pointer; font-family:inherit; font-size:11.5px; font-weight:700;
+  border-radius:12px; padding:8px 10px; background:var(--sheet); color:var(--muted);
+}
+.tok-db-btn:active { transform:scale(0.97); }
+.tok-db-status { text-align:center; color:var(--muted); font-size:11px; margin-bottom:8px; min-height:13px; flex-shrink:0; }
+.tok-db-toggle.active { color:var(--ink); background:var(--dusk); }
 
 .tok-queue { display:flex; flex-direction:column; gap:8px; overflow-y:auto; flex:1; min-height:0; }
 .tok-queue-empty { text-align:center; color:var(--muted); font-size:13px; padding:24px 0; }
@@ -228,6 +462,8 @@ html, body { height:100%; margin:0; }
   transform: scale(0.94) translateY(-10vh); transition: transform 0.25s ease;
 }
 .tok-modal-backdrop.open .tok-modal { transform: scale(1) translateY(-10vh); }
+#tokPlaylistBackdrop .tok-modal { transform: scale(0.94) translateY(-25vh); }
+#tokPlaylistBackdrop.open .tok-modal { transform: scale(1) translateY(-25vh); }
 .tok-modal-title { font-family:'Fraunces',serif; font-weight:900; font-size:18px; margin-bottom:6px; }
 .tok-modal-text { color:var(--muted); font-size:13px; margin-bottom:14px; line-height:1.4; }
 .tok-modal-input {
@@ -246,7 +482,76 @@ html, body { height:100%; margin:0; }
 }
 .tok-modal-btn.primary { background:var(--dusk); color:var(--ink); }
 .tok-modal-btn:active { transform:scale(0.96); }
+.tok-playlist-divider {
+  display:flex; align-items:center; gap:10px; margin:14px 0 10px;
+  color:var(--muted); font-size:12px;
+}
+.tok-playlist-divider::before,.tok-playlist-divider::after {
+  content:''; flex:1; height:1px; background:rgba(255,255,255,0.1);
+}
+.tok-local-load-btn {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; border:1px dashed rgba(255,255,255,0.2);
+  padding:11px 18px; margin-bottom:4px;
+  color:var(--muted); transition:color 0.15s, border-color 0.15s;
+}
+.tok-local-load-btn:hover { color:var(--dusk); border-color:var(--dusk); }
+
+.tok-about-author {
+  margin-top:6px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.tok-about-author-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+.tok-about-author-name { font-family:'Fraunces',serif; font-weight:900; font-size:17px; margin-top:2px; }
+.tok-about-links { display:flex; gap:8px; flex-shrink:0; }
+.tok-about-link {
+  display:flex; align-items:center; justify-content:center;
+  width:38px; height:38px; border-radius:50%;
+  background:var(--sheet); color:var(--ink); transition:background 0.15s ease, transform 0.1s ease;
+}
+.tok-about-link svg { width:18px; height:18px; flex-shrink:0; }
+.tok-about-link:active { transform:scale(0.92); background:var(--dusk); }
+
+.tok-playlist-saved-list { display:flex; flex-direction:column; gap:8px; margin-top:18px; max-height:220px; overflow-y:auto; }
+.tok-playlist-saved-row {
+  display:flex; align-items:center; gap:10px; background:var(--sheet); border-radius:14px; padding:10px 12px;
+}
+.tok-playlist-saved-meta { flex:1; min-width:0; }
+.tok-playlist-saved-name {
+  font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.tok-playlist-saved-name-clickable { cursor:pointer; }
+.tok-playlist-saved-name-clickable:active { color:var(--dusk); }
+.tok-playlist-saved-link {
+  display:block; font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  text-decoration:none; margin-top:2px;
+}
+.tok-playlist-saved-link:active { color:var(--dusk); }
+.tok-playlist-saved-remove {
+  border:none; cursor:pointer; background:transparent; color:var(--muted); font-size:15px;
+  flex-shrink:0; padding:4px 6px; border-radius:8px;
+}
+.tok-playlist-saved-remove:active { color:var(--dusk); background:rgba(0,0,0,0.18); }
+
+/* ---------- fullscreen restore banner ---------- */
+.tok-fs-restore {
+  position: fixed; bottom: max(28px, env(safe-area-inset-bottom));
+  left: 50%; transform: translateX(-50%);
+  z-index: 100;
+  background: var(--dusk); color: var(--ink);
+  border: none; border-radius: 999px;
+  padding: 11px 22px; font-family: inherit; font-size: 14px; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+  animation: tok-fs-restore-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.tok-fs-restore:active { transform: translateX(-50%) scale(0.96); }
+@keyframes tok-fs-restore-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px) scale(0.92); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .tok-vinyl-cover, .tok-sheet, .tok-backdrop { animation:none !important; transition:none !important; }
+  .tok-vinyl-cover, .tok-vinyl-wrap::before, .tok-sheet, .tok-backdrop { animation:none !important; transition:none !important; }
+  .tok-dir-flow-arrows-track { animation:none !important; will-change:auto !important; }
 }
