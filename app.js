@@ -526,6 +526,8 @@ if (els.refreshDirs) {
     if (navigator.vibrate) navigator.vibrate(10);
     // Exclude current candidates so refresh always picks different songs.
     // Preserve armedDir so the user's chosen direction isn't reset.
+    // Clear any "play next" highlight left over from a previous playNext() call.
+    els.dirs.querySelectorAll('.tok-dir-replaced').forEach(c => c.classList.remove('tok-dir-replaced'));
     const prevCandidates = currentCandidates;
     const extraHistory = prevCandidates
       ? ['up', 'flow', 'down'].map(d => prevCandidates[d].t)
