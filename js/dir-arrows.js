@@ -9,9 +9,9 @@ const ICONS = {
 };
 
 const PARAMS = {
-  up:   { rows: 30, spread: 600, speed: 15.5, size: 15, opacity: 0.15, gapMin: 24, gapMax: 102, iconsPerRow: 5 },
-  down: { rows: 30, spread: 600, speed: 15.5, size: 15, opacity: 0.15, gapMin: 24, gapMax: 102, iconsPerRow: 5 },
-  flow: { rows: 3,  spread: 70,  speed: 26,   size: 15, opacity: 0.22, gapMin: 14, gapMax: 60,  iconsPerRow: 14 },
+  up:   { rows: 30, spread: 600, speed: 15.5, size: 15, opacity: 0.18,  gapMin: 24, gapMax: 102, iconsPerRow: 5 },
+  down: { rows: 30, spread: 600, speed: 15.5, size: 15, opacity: 0.18,  gapMin: 24, gapMax: 102, iconsPerRow: 5 },
+  flow: { rows: 3,  spread: 70,  speed: 26,   size: 15, opacity: 0.264, gapMin: 14, gapMax: 60,  iconsPerRow: 14 },
 };
 
 function svgFor(kind, gap, jitter){
