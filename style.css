@@ -219,26 +219,24 @@ html, body { height:100%; margin:0; }
 .tok-dirs-actions { display:flex; align-items:center; gap:8px; }
 #tokQueueToggle.tok-refresh-dirs { font-size:17px; line-height:1; }
 .tok-dir {
-  position:relative;
-  border:none; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
+  position:relative; box-sizing:border-box;
+  border:2px solid transparent; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
   background: var(--stage); border-radius:16px; padding:10px 14px; display:flex; align-items:center; gap:12px;
   opacity:0.55;
-  transition: opacity 0.2s, background 0.45s ease-out,
+  transition: opacity 0.2s, background 0.45s ease-out, border-color 0.3s ease,
     transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation;
 }
 .tok-dir:active { transform:scale(0.96); transition: transform 0.08s ease-out; }
-.tok-dir.chosen { opacity:1; background:var(--dusk); }
+.tok-dir.chosen { opacity:1; background:var(--stage); border-color:var(--dusk); }
 .tok-dir-cover { width:40px; height:40px; border-radius:12px; flex-shrink:0; background-size:cover; background-position:center; background-color:var(--sheet); }
 .tok-dir-meta { flex:1; min-width:0; }
 .tok-dir-track { font-family:'Fraunces',serif; font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .tok-dir-artist { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
-.tok-dir.chosen .tok-dir-artist { color:rgba(255,255,255,0.75); }
 .tok-dir-bpm { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); opacity:0.65; margin-top:2px; min-height:14px; }
-.tok-dir.chosen .tok-dir-bpm { color:rgba(255,255,255,0.6); }
 .tok-dir-icon { flex-shrink:0; color:var(--muted); display:flex; }
 .tok-dir-icon svg { width:19px; height:19px; }
-.tok-dir.chosen .tok-dir-icon { color:#fff; }
+.tok-dir.chosen .tok-dir-icon { color:var(--dusk); }
 .tok-dir.chosen .tok-dir-icon svg { fill:currentColor; stroke:none; }
 .tok-dir[data-dir="flow"].chosen .tok-dir-icon svg { fill:none; stroke:currentColor; stroke-width:2.6; }
 
