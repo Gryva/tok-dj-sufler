@@ -712,7 +712,10 @@ attachLongPress(els.playlistInfo, '.tok-playlist-info', (_, pos) => {
   })));
 });
 
-attachLongPress(els.settingsBtn, '#tokSettingsBtn', (_, pos) => {
+els.settingsBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const rect = els.settingsBtn.getBoundingClientRect();
+  const pos = { x: rect.left + rect.width / 2, y: rect.bottom };
   const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   openContextMenu(pos.x, pos.y, [
     {
@@ -755,6 +758,7 @@ function updateMediaSession(t){
 function updateNowPlayingUI(t){
   localStorage.setItem('tok_last_track_id', t.id);
   els.vinylImg.src = t.thumb;
+  els.title.removeAttribute('data-i18n');
   els.title.textContent = t.title;
   const nowBpm = window.TokEngine ? window.TokEngine.getBPM(t) : null;
   els.artist.textContent = t.artist + (nowBpm ? ' · ' + nowBpm + ' BPM' : '');
@@ -882,11 +886,13 @@ setInterval(() => {
   try {
     await fetchPlaylist();
   } catch (err) {
+    els.title.removeAttribute('data-i18n');
     els.title.textContent = t('fetchPlaylistError');
     els.artist.textContent = String((err && err.message) || err);
     return;
   }
   if (!tracks.length) {
+    els.title.removeAttribute('data-i18n');
     els.title.textContent = t('playlistEmpty');
     return;
   }
@@ -991,9 +997,11 @@ let openThemeColorMenu = () => {};
   syncCustomPanelToHue();
   apply(saved || DEFAULT_DUSK);
 
-  openThemeColorMenu = () => menu.classList.add('open');
+  let menuOpenedAt = 0;
+  openThemeColorMenu = () => { menu.classList.add('open'); menuOpenedAt = Date.now(); };
   document.addEventListener('click', (e) => {
     if (!menu.classList.contains('open')) return;
+    if (Date.now() - menuOpenedAt < 50) return;
     if (e.target === toggleBtn || menu.contains(e.target)) return;
     menu.classList.remove('open');
   });
