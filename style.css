@@ -304,8 +304,8 @@ html, body { height:100%; margin:0; }
 }
 .tok-ctx-item:not(:last-child) { border-bottom:1px solid rgba(0,0,0,0.18); }
 .tok-ctx-item:active { background:rgba(0,0,0,0.18); }
-.tok-ctx-icon { display:flex; flex-shrink:0; width:16px; height:16px; }
-.tok-ctx-icon svg { width:100%; height:100%; }
+.tok-ctx-icon { display:flex; flex-shrink:0; width:16px; height:16px; color:var(--ctx-text, #fff); }
+.tok-ctx-icon svg { width:100%; height:100%; stroke:var(--ctx-text, #fff); fill:none; }
 
 /* ---------- queue sheet ---------- */
 .tok-backdrop {
