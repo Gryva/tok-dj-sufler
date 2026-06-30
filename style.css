@@ -127,6 +127,14 @@ html, body { height:100%; margin:0; }
 }
 .tok-wave-bar.played { background: var(--wave-accent, var(--gold)); }
 
+.tok-wave-mini { display:flex; align-items:center; gap:2px; height:14px; flex-shrink:0; }
+.tok-wave-mini-bar {
+  width:2px; height:100%; border-radius:2px;
+  background: var(--wave-accent, var(--gold));
+  transform-origin: center;
+  animation: tok-wave-breathe var(--dur, 1.4s) ease-in-out infinite var(--delay, 0s);
+}
+
 /* ---------- direction picker ---------- */
 @keyframes tok-refresh-spin { to { transform: rotate(360deg); } }
 @keyframes tok-dir-refresh {

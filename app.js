@@ -107,10 +107,26 @@ function buildWave(){
   }
   els.wave.innerHTML = html;
 }
+const MINI_WAVE_BARS = 12;
+function buildMiniWaveHTML(){
+  let html = '';
+  for (let i = 0; i < MINI_WAVE_BARS; i++) {
+    const dur   = (1.2 + Math.random() * 1.6).toFixed(2);
+    const delay = (-Math.random() * 2.8).toFixed(2);
+    const min   = (0.3 + Math.random() * 0.3).toFixed(2);
+    html += '<div class="tok-wave-mini-bar" style="'
+      + '--dur:' + dur + 's;'
+      + '--delay:' + delay + 's;'
+      + '--wave-min:' + min
+      + '"></div>';
+  }
+  return html;
+}
 function setWaveAnimation(playing){
   const state = playing ? 'running' : 'paused';
   const bars = els.wave.children;
   for (let i = 0; i < bars.length; i++) bars[i].style.animationPlayState = state;
+  els.queue.querySelectorAll('.tok-wave-mini-bar').forEach(b => { b.style.animationPlayState = state; });
 }
 function updateWaveProgress(pct){
   const bars = els.wave.children;
@@ -225,8 +241,10 @@ function renderQueue(){
       '<div class="tok-queue-artist">' + t.artist + '</div></div>' +
       (bpm ? '<div class="tok-queue-bpm">' + bpm + ' BPM</div>' : '') +
       (isCandidate ? '<div class="tok-queue-candicon">' + CANDIDATE_ICON[dir] + '</div>' : '') +
-      '<div class="tok-queue-dur">' + fmtTime(t.durationSec) + '</div></button>';
+      (isCurrent ? '<div class="tok-wave-mini">' + buildMiniWaveHTML() + '</div>' : '<div class="tok-queue-dur">' + fmtTime(t.durationSec) + '</div>') +
+      '</button>';
   }).join('');
+  setWaveAnimation(state.playing);
 }
 
 if (els.queueSearch) {
