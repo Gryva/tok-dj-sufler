@@ -141,15 +141,15 @@ html, body { height:100%; margin:0; }
 .tok-dirs { display:flex; flex-direction:column; gap:10px; width:100%; }
 .tok-refresh-dirs {
   border:none; cursor:pointer; background:transparent;
-  color:var(--muted); padding:6px; border-radius:50%;
+  color:var(--muted); padding:7px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
   transition: color 0.15s, background 0.15s;
 }
-.tok-refresh-dirs svg { width:16px; height:16px; }
+.tok-refresh-dirs svg { width:19px; height:19px; }
 .tok-refresh-dirs:active { color:var(--ink); background:rgba(255,255,255,0.08); }
 .tok-refresh-dirs.spinning svg { animation: tok-refresh-spin 0.45s ease-out; }
 .tok-dirs-actions { display:flex; align-items:center; gap:8px; }
-#tokQueueToggle.tok-refresh-dirs { font-size:14px; line-height:1; }
+#tokQueueToggle.tok-refresh-dirs { font-size:17px; line-height:1; }
 .tok-dir {
   position:relative;
   border:none; cursor:pointer; text-align:left; font-family:inherit; color:var(--ink);
