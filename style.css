@@ -248,11 +248,11 @@ html, body { height:100%; margin:0; }
   position:absolute; top:50%; left:0; width:max-content;
   display:flex; align-items:center;
   transform:translateY(-50%) translateX(-50%);
-  animation: tok-flow-arrows-move 7s linear infinite;
-  opacity:0.22;
+  animation: tok-flow-arrows-move var(--tok-arrow-speed, 7s) linear infinite;
+  opacity:var(--tok-arrow-opacity, 0.22);
 }
 .tok-dir-flow-arrows-track svg {
-  width:13px; height:13px; flex-shrink:0; color:var(--dusk);
+  width:var(--tok-arrow-size, 13px); height:var(--tok-arrow-size, 13px); flex-shrink:0; color:var(--dusk);
 }
 @keyframes tok-flow-arrows-move {
   from { transform: translateY(-50%) translateX(-50%); }
@@ -271,7 +271,7 @@ html, body { height:100%; margin:0; }
 .tok-dir.chosen .tok-dir-flow-arrows.diag-up .tok-dir-flow-arrows-track,
 .tok-dir.chosen .tok-dir-flow-arrows.diag-down .tok-dir-flow-arrows-track {
   animation-play-state: running;
-  opacity: 0.22;
+  opacity: var(--tok-arrow-opacity, 0.22);
 }
 .tok-dir-flow-arrows.diag-up .tok-dir-flow-arrows-track {
   transform: translateY(-50%) rotate(-45deg) translateX(-50%);
@@ -289,15 +289,6 @@ html, body { height:100%; margin:0; }
   from { transform: translateY(-50%) rotate(45deg) translateX(-50%); }
   to   { transform: translateY(-50%) rotate(45deg) translateX(0%); }
 }
-
-/* Stack 3 parallel tracks per up/down card so the diagonal arrows cover
-   the whole button instead of tracing a single line through the middle. */
-.tok-dir-flow-arrows.diag-up .tok-dir-flow-arrows-track.row1,
-.tok-dir-flow-arrows.diag-down .tok-dir-flow-arrows-track.row1 { top: 15%; animation-delay: -1.5s; }
-.tok-dir-flow-arrows.diag-up .tok-dir-flow-arrows-track.row2,
-.tok-dir-flow-arrows.diag-down .tok-dir-flow-arrows-track.row2 { top: 50%; animation-delay: -3.8s; }
-.tok-dir-flow-arrows.diag-up .tok-dir-flow-arrows-track.row3,
-.tok-dir-flow-arrows.diag-down .tok-dir-flow-arrows-track.row3 { top: 85%; animation-delay: -5.6s; }
 
 /* "play next" just swapped this card's track in — strong pop + glow so it
    reads as a deliberate replacement rather than the usual suggestion refresh. */
