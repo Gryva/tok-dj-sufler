@@ -24,7 +24,7 @@ export function openContextMenu(x, y, items){
   menu.innerHTML = items.map((item, i) =>
     '<button class="tok-ctx-item" data-i="' + i + '">' + item.label + '</button>'
   ).join('');
-  document.body.appendChild(menu);
+  (document.querySelector('.tok-app') || document.body).appendChild(menu);
   menuEl = menu;
 
   // Position after insertion so we know its real size, then clamp to viewport.
