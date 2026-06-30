@@ -49,9 +49,22 @@ html, body { height:100%; margin:0; }
 }
 
 /* ---------- vinyl ---------- */
+@keyframes tok-vinyl-glow {
+  0%, 100% { transform: translate(-50%,-50%) scale(1);   opacity: 0.55; }
+  50%       { transform: translate(-50%,-50%) scale(1.18); opacity: 0.28; }
+}
 .tok-vinyl-wrap {
   position:relative; width: min(48vw, 210px); aspect-ratio: 1; flex-shrink: 0;
   -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:manipulation;
+}
+.tok-vinyl-wrap::before {
+  content:''; position:absolute; z-index:0;
+  top:50%; left:50%;
+  width:140%; height:140%;
+  border-radius:50%;
+  background: radial-gradient(circle, var(--wave-accent, var(--gold)) 0%, transparent 70%);
+  animation: tok-vinyl-glow 3.2s ease-in-out infinite;
+  pointer-events:none;
 }
 
 /* cover art sits behind the ring and spins on its own */
@@ -367,5 +380,5 @@ html, body { height:100%; margin:0; }
 .tok-playlist-saved-remove:active { color:var(--dusk); background:rgba(0,0,0,0.18); }
 
 @media (prefers-reduced-motion: reduce) {
-  .tok-vinyl-cover, .tok-sheet, .tok-backdrop { animation:none !important; transition:none !important; }
+  .tok-vinyl-cover, .tok-vinyl-wrap::before, .tok-sheet, .tok-backdrop { animation:none !important; transition:none !important; }
 }
