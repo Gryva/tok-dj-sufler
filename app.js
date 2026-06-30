@@ -239,9 +239,10 @@ function renderQueue(){
       '<div class="tok-cover--queue" style="background-image:url(\'' + t.thumb + '\')"></div>' +
       '<div class="tok-queue-meta"><div class="tok-queue-title">' + t.title + '</div>' +
       '<div class="tok-queue-artist">' + t.artist + '</div></div>' +
+      (isCurrent ? '<div class="tok-wave-mini">' + buildMiniWaveHTML() + '</div>' : '') +
       (bpm ? '<div class="tok-queue-bpm">' + bpm + ' BPM</div>' : '') +
       (isCandidate ? '<div class="tok-queue-candicon">' + CANDIDATE_ICON[dir] + '</div>' : '') +
-      (isCurrent ? '<div class="tok-wave-mini">' + buildMiniWaveHTML() + '</div>' : '<div class="tok-queue-dur">' + fmtTime(t.durationSec) + '</div>') +
+      '<div class="tok-queue-dur">' + fmtTime(t.durationSec) + '</div>' +
       '</button>';
   }).join('');
   setWaveAnimation(state.playing);

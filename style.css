@@ -127,7 +127,7 @@ html, body { height:100%; margin:0; }
 }
 .tok-wave-bar.played { background: var(--wave-accent, var(--gold)); }
 
-.tok-wave-mini { display:flex; align-items:center; gap:2px; height:14px; flex-shrink:0; }
+.tok-wave-mini { display:flex; align-items:center; justify-content:center; gap:2px; height:14px; flex:1; min-width:18px; }
 .tok-wave-mini-bar {
   width:2px; height:100%; border-radius:2px;
   background: var(--wave-accent, var(--gold));
