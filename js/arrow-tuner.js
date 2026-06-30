@@ -68,7 +68,7 @@ function rebuildAll(){
 function buildPanel(){
   const panel = document.createElement('div');
   panel.id = 'tokArrowTuner';
-  panel.style.cssText = 'position:fixed; right:8px; bottom:8px; z-index:9999; background:rgba(20,20,24,0.92); color:#fff; font:12px/1.4 system-ui,sans-serif; padding:10px 12px; border-radius:10px; width:220px; max-height:80vh; overflow:auto; box-shadow:0 4px 24px rgba(0,0,0,0.4);';
+  panel.style.cssText = 'position:fixed; left:8px; top:8px; z-index:9999; background:rgba(20,20,24,0.92); color:#fff; font:12px/1.4 system-ui,sans-serif; padding:10px 12px; border-radius:10px; width:220px; max-height:60vh; overflow:auto; box-shadow:0 4px 24px rgba(0,0,0,0.4);';
 
   const controls = [
     { key: 'rows', label: 'Rows', min: 1, max: 8, step: 1 },
