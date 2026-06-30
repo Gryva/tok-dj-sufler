@@ -888,3 +888,33 @@ setInterval(() => {
   tag.src = 'https://www.youtube.com/iframe_api';
   document.head.appendChild(tag);
 })();
+
+// ---------- DEBUG-COLOR-PICKER:START (temporary, remove later) ----------
+(function setupDebugColorPicker(){
+  const input = document.getElementById('tokDebugColorInput');
+  const resetBtn = document.getElementById('tokDebugColorReset');
+  const appEl = document.querySelector('.tok-app');
+  if (!input || !appEl) return;
+  const DEFAULT_DUSK = '#E2401D';
+  const STORAGE_KEY = 'tok_debug_dusk';
+  function apply(color){
+    appEl.style.setProperty('--dusk', color);
+  }
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    input.value = saved;
+    apply(saved);
+  }
+  input.addEventListener('input', () => {
+    apply(input.value);
+    localStorage.setItem(STORAGE_KEY, input.value);
+  });
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      input.value = DEFAULT_DUSK;
+      appEl.style.removeProperty('--dusk');
+      localStorage.removeItem(STORAGE_KEY);
+    });
+  }
+})();
+// ---------- DEBUG-COLOR-PICKER:END ----------

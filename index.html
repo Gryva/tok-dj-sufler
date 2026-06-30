@@ -12,9 +12,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TOK">
-<link rel="stylesheet" href="style.css?v=73">
+<link rel="stylesheet" href="style.css?v=74">
 </head>
 <body style="margin:0; background:#16100E; height:100%;">
+
+<!-- DEBUG-COLOR-PICKER:START (temporary, remove later) -->
+<div id="tokDebugColorPicker" style="position:fixed; top:max(10px, env(safe-area-inset-top)); right:10px; z-index:9999; display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.55); padding:6px 8px; border-radius:10px; font-family:sans-serif;">
+  <input type="color" id="tokDebugColorInput" value="#E2401D" style="width:34px; height:34px; border:none; padding:0; background:none; cursor:pointer;">
+  <button id="tokDebugColorReset" style="font-size:11px; color:#fff; background:rgba(255,255,255,0.15); border:none; border-radius:6px; padding:6px 8px; cursor:pointer;">Reset</button>
+</div>
+<!-- DEBUG-COLOR-PICKER:END -->
 
 <div class="tok-app">
   <div class="tok-head">
@@ -204,7 +211,7 @@
   </div>
 </div>
 
-<script src="engine.js?v=73"></script>
-<script type="module" src="app.js?v=73"></script>
+<script src="engine.js?v=74"></script>
+<script type="module" src="app.js?v=74"></script>
 </body>
 </html>
