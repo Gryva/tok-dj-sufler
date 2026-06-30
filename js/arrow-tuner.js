@@ -71,31 +71,39 @@ function buildPanel(){
   panel.style.cssText = 'position:fixed; left:8px; top:8px; z-index:9999; background:rgba(20,20,24,0.92); color:#fff; font:12px/1.4 system-ui,sans-serif; padding:10px 12px; border-radius:10px; width:220px; max-height:60vh; overflow:auto; box-shadow:0 4px 24px rgba(0,0,0,0.4);';
 
   const controls = [
-    { key: 'rows', label: 'Rows', min: 1, max: 8, step: 1 },
-    { key: 'spread', label: 'Spread %', min: 0, max: 100, step: 1 },
-    { key: 'speed', label: 'Speed (s)', min: 2, max: 15, step: 0.5 },
-    { key: 'size', label: 'Icon size (px)', min: 6, max: 28, step: 1 },
-    { key: 'opacity', label: 'Opacity', min: 0.05, max: 0.7, step: 0.01 },
-    { key: 'gapMin', label: 'Gap min (px)', min: 4, max: 60, step: 1 },
-    { key: 'gapMax', label: 'Gap max (px)', min: 4, max: 80, step: 1 },
-    { key: 'iconsPerRow', label: 'Icons per row', min: 4, max: 30, step: 1 },
+    { key: 'rows', label: 'Rows', min: 1, max: 40, step: 1 },
+    { key: 'spread', label: 'Spread %', min: 0, max: 400, step: 1 },
+    { key: 'speed', label: 'Speed (s)', min: 0.1, max: 60, step: 0.1 },
+    { key: 'size', label: 'Icon size (px)', min: 1, max: 100, step: 1 },
+    { key: 'opacity', label: 'Opacity', min: 0, max: 1, step: 0.01 },
+    { key: 'gapMin', label: 'Gap min (px)', min: 0, max: 300, step: 1 },
+    { key: 'gapMax', label: 'Gap max (px)', min: 0, max: 300, step: 1 },
+    { key: 'iconsPerRow', label: 'Icons per row', min: 1, max: 120, step: 1 },
   ];
 
+  // Each control also gets a free-typed number input next to it, so the
+  // slider's min/max never actually caps what you can set — drag for quick
+  // changes, or type any value (even outside the slider's range) directly.
   let html = '<div style="font-weight:600; margin-bottom:6px;">Arrow tuner (debug)</div>';
   controls.forEach(c => {
-    html += `<label style="display:block; margin-bottom:6px;">${c.label}: <span id="tokArrowVal-${c.key}">${params[c.key]}</span><br>
-      <input type="range" data-key="${c.key}" min="${c.min}" max="${c.max}" step="${c.step}" value="${params[c.key]}" style="width:100%;">
+    html += `<label style="display:block; margin-bottom:6px;">${c.label}:
+      <input type="number" data-key="${c.key}" data-role="number" value="${params[c.key]}" step="${c.step}" style="width:60px; margin-left:4px;"><br>
+      <input type="range" data-key="${c.key}" data-role="range" min="${c.min}" max="${c.max}" step="${c.step}" value="${params[c.key]}" style="width:100%;">
     </label>`;
   });
   html += '<button id="tokArrowReroll" style="width:100%; margin-top:4px; padding:6px; border-radius:6px; border:none; cursor:pointer;">Re-roll spacing</button>';
   panel.innerHTML = html;
   document.body.appendChild(panel);
 
-  panel.querySelectorAll('input[type="range"]').forEach(input => {
+  panel.querySelectorAll('input[data-key]').forEach(input => {
     input.addEventListener('input', () => {
       const key = input.dataset.key;
-      params[key] = parseFloat(input.value);
-      panel.querySelector(`#tokArrowVal-${key}`).textContent = params[key];
+      const val = parseFloat(input.value);
+      if (Number.isNaN(val)) return;
+      params[key] = val;
+      panel.querySelectorAll(`input[data-key="${key}"]`).forEach(sibling => {
+        if (sibling !== input) sibling.value = val;
+      });
       rebuildAll();
     });
   });
