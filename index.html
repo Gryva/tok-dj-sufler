@@ -1,27 +1,65 @@
 <!DOCTYPE html>
-<html lang="hr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>TOK — DJ sufler (demo)</title>
+<title>Flow — DJ prompter</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
-<meta name="theme-color" content="#16100E">
+<meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="TOK">
-<link rel="stylesheet" href="style.css?v=15">
+<meta name="apple-mobile-web-app-title" content="Flow">
+<link rel="stylesheet" href="style.css?v=116">
 </head>
-<body style="margin:0; background:#16100E; height:100%;">
+<body style="margin:0; background:#000000; height:100%;">
 
 <div class="tok-app">
   <div class="tok-head">
-    <div class="tok-wordmark">TOK</div>
+    <div class="tok-wordmark">Flow</div>
     <div class="tok-head-actions">
-      <button class="tok-yt-link" id="tokQueueToggle" aria-label="Otvori queue">☰</button>
-      <button class="tok-yt-link" id="tokChangePlaylist" aria-label="Promijeni playlistu">⇄</button>
+      <button class="tok-yt-link" id="tokFullscreenToggle" aria-label="Fullscreen" data-i18n-aria="fullscreen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+          <path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+        </svg>
+      </button>
+      <div class="tok-color-wrap">
+        <button class="tok-yt-link" id="tokSettingsBtn" aria-label="Settings" data-i18n-aria="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+        <div class="tok-color-menu" id="tokColorMenu">
+          <div class="tok-color-menu-label" data-i18n="themeColor">Theme color</div>
+          <div class="tok-color-swatches" id="tokColorSwatches">
+            <button class="tok-color-swatch" data-color="#E2401D" style="background:#E2401D" aria-label="#E2401D"></button>
+            <button class="tok-color-swatch" data-color="#FF5A3C" style="background:#FF5A3C" aria-label="#FF5A3C"></button>
+            <button class="tok-color-swatch" data-color="#F0883E" style="background:#F0883E" aria-label="#F0883E"></button>
+            <button class="tok-color-swatch" data-color="#FFC857" style="background:#FFC857" aria-label="#FFC857"></button>
+            <button class="tok-color-swatch" data-color="#E0556B" style="background:#E0556B" aria-label="#E0556B"></button>
+            <button class="tok-color-swatch" data-color="#8C52E0" style="background:#8C52E0" aria-label="#8C52E0"></button>
+            <button class="tok-color-swatch" data-color="#3EA0E0" style="background:#3EA0E0" aria-label="#3EA0E0"></button>
+            <button class="tok-color-swatch" data-color="#4FB877" style="background:#4FB877" aria-label="#4FB877"></button>
+            <button class="tok-color-swatch tok-color-custom" id="tokColorCustomBtn" aria-label="Custom" data-i18n-aria="custom">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="tok-color-custom-panel" id="tokColorCustomPanel">
+            <div class="tok-color-sl" id="tokColorSL">
+              <div class="tok-color-sl-thumb" id="tokColorSLThumb"></div>
+            </div>
+            <input class="tok-color-hue" id="tokColorHue" type="range" min="0" max="360" value="9">
+            <input class="tok-color-hex" id="tokColorHexInput" type="text" placeholder="#E2401D" maxlength="7" inputmode="text" autocapitalize="characters">
+          </div>
+          <button class="tok-color-reset" id="tokColorReset" data-i18n="resetDefault">Reset to default</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -35,7 +73,7 @@
     </div>
 
     <div class="tok-nowmeta">
-      <div class="tok-now-title" id="tokNowTitle">Učitavanje playliste…</div>
+      <div class="tok-now-title" id="tokNowTitle" data-i18n="loadingPlaylist">Loading playlist…</div>
       <div class="tok-now-artist" id="tokNowArtist"></div>
       <div class="tok-status" id="tokStatus"></div>
     </div>
@@ -46,11 +84,12 @@
       <button class="tok-skipbtn" id="tokPrevBtn" aria-label="Prošla pjesma">⏮</button>
       <button class="tok-playbtn" id="tokPlayBtn" aria-label="Pusti / pauziraj">▶</button>
       <button class="tok-skipbtn" id="tokNextBtn" aria-label="Sljedeća pjesma">⏭</button>
-      <button class="tok-crossfade-btn" id="tokCrossfadeToggle" aria-label="Uključi/isključi crossfade">⇌</button>
     </div>
 
+    <div class="tok-dirs-wrap">
     <div class="tok-dirs" id="tokDirs">
       <button class="tok-dir" data-dir="up">
+        <div class="tok-dir-flow-arrows diag-up" aria-hidden="true"></div>
         <div class="tok-dir-cover"></div>
         <div class="tok-dir-meta">
           <div class="tok-dir-track"></div>
@@ -64,6 +103,7 @@
         </div>
       </button>
       <button class="tok-dir" data-dir="flow">
+        <div class="tok-dir-flow-arrows" aria-hidden="true"></div>
         <div class="tok-dir-cover"></div>
         <div class="tok-dir-meta">
           <div class="tok-dir-track"></div>
@@ -78,6 +118,7 @@
         </div>
       </button>
       <button class="tok-dir" data-dir="down">
+        <div class="tok-dir-flow-arrows diag-down" aria-hidden="true"></div>
         <div class="tok-dir-cover"></div>
         <div class="tok-dir-meta">
           <div class="tok-dir-track"></div>
@@ -91,20 +132,36 @@
         </div>
       </button>
     </div>
+    <div class="tok-dirs-actions">
+      <button class="tok-refresh-dirs" id="tokRefreshDirs" aria-label="New suggestions" data-i18n-aria="refreshSuggestions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </button>
+      <button class="tok-refresh-dirs" id="tokQueueToggle" aria-label="Open queue" data-i18n-aria="openQueue">☰</button>
+    </div>
+    </div>
   </div>
 
   <div id="ytPlayer" style="position:absolute; width:1px; height:1px; opacity:0.01; pointer-events:none; overflow:hidden;"></div>
-  <div id="ytPlayerB" style="position:absolute; width:1px; height:1px; opacity:0.01; pointer-events:none; overflow:hidden;"></div>
 
   <div class="tok-backdrop" id="tokBackdrop"></div>
   <div class="tok-sheet" id="tokSheet">
     <div class="tok-sheet-handle" id="tokHandle"></div>
     <div class="tok-sheet-header">
-      <div class="tok-sheet-title">Queue</div>
+      <div class="tok-sheet-title" data-i18n="queueTitle">Queue</div>
       <div class="tok-order-wrap">
         <div class="tok-order-label" id="tokOrderLabel"></div>
-        <button class="tok-order-btn" id="tokOrderToggle" aria-label="Redoslijed reprodukcije">
+        <button class="tok-order-btn" id="tokOrderToggle" aria-label="Playback order" data-i18n-aria="playOrder">
           <svg id="tokOrderIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        </button>
+        <button class="tok-order-btn tok-db-toggle" id="tokDbToggle" aria-label="Database" data-i18n-aria="database">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -116,52 +173,106 @@
       </div>
     </div>
 
-    <input class="tok-queue-search" id="tokQueueSearch" type="text" placeholder="Pretraži pjesme...">
+    <input class="tok-queue-search" id="tokQueueSearch" type="text" placeholder="Search songs..." data-i18n-placeholder="searchPlaceholder">
+
+    <div class="tok-db-drawer" id="tokDbDrawer">
+      <div class="tok-db-drawer-inner">
+        <div class="tok-db-actions">
+          <button class="tok-db-btn" id="tokDbExport" data-i18n="dbExport">⤓ Save database</button>
+          <button class="tok-db-btn" id="tokDbImport" data-i18n="dbImport">⤒ Load database</button>
+          <input type="file" id="tokDbImportFile" accept="application/json" style="display:none">
+        </div>
+        <div class="tok-db-status" id="tokDbStatus"></div>
+      </div>
+    </div>
 
     <div class="tok-queue" id="tokQueue"></div>
   </div>
 
   <div class="tok-modal-backdrop" id="tokPlaylistBackdrop">
     <div class="tok-modal">
-      <div class="tok-modal-title">Promijeni playlistu</div>
-      <div class="tok-modal-text">Zalijepi YouTube Music playlist link ili ID.</div>
+      <div class="tok-modal-title" data-i18n="addPlaylistTitle">Add playlist</div>
+      <div class="tok-modal-text" data-i18n="addPlaylistText">Paste a YouTube Music playlist link or ID. Long-press the playlist name in the queue to switch between saved playlists.</div>
       <input class="tok-modal-input" id="tokPlaylistInput" type="text" placeholder="https://music.youtube.com/playlist?list=...">
       <div class="tok-modal-error" id="tokPlaylistError"></div>
       <div class="tok-modal-actions">
-        <button class="tok-modal-btn" id="tokPlaylistCancel">Odustani</button>
-        <button class="tok-modal-btn primary" id="tokPlaylistSave">Spremi</button>
+        <button class="tok-modal-btn" id="tokPlaylistCancel" data-i18n="cancel">Cancel</button>
+        <button class="tok-modal-btn primary" id="tokPlaylistSave" data-i18n="save">Save</button>
+      </div>
+      <div class="tok-playlist-divider"><span data-i18n="orLoadLocal">or</span></div>
+      <button class="tok-modal-btn tok-local-load-btn" id="tokLocalLoadBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span data-i18n="loadFromDevice">Load from device</span>
+      </button>
+      <input type="file" id="tokLocalFileInput" accept="audio/*" multiple style="display:none">
+      <div class="tok-playlist-saved-list" id="tokPlaylistSavedList"></div>
+    </div>
+  </div>
+
+  <div class="tok-modal-backdrop" id="tokAboutBackdrop">
+    <div class="tok-modal">
+      <div class="tok-modal-title">Flow</div>
+      <div class="tok-modal-text" data-i18n="aboutText">Flow is a DJ prompter for YouTube Music playlists — it listens to the current song and suggests the next one by tempo, energy and key, so the mix flows smoothly without interruptions.</div>
+      <div class="tok-modal-text" data-i18n="aboutText2">Pick a direction, build energy, wind it down, or hold steady, and Flow keeps queuing tracks that fit. Track metadata, playlists and your theme are all saved on this device.</div>
+      <div class="tok-about-author">
+        <div class="tok-about-author-info">
+          <div class="tok-about-author-label" data-i18n="madeBy">Made by</div>
+          <div class="tok-about-author-name">Griva</div>
+        </div>
+        <div class="tok-about-links">
+          <a class="tok-about-link" href="https://www.behance.net/griva_lg" target="_blank" rel="noopener noreferrer" aria-label="Behance">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M3 18v-12h4.5a3 3 0 0 1 0 6a3 3 0 0 1 0 6h-4.5"/>
+              <path d="M3 12l4.5 0"/>
+              <path d="M14 13h7a3.5 3.5 0 0 0 -7 0v2a3.5 3.5 0 0 0 6.64 1"/>
+              <path d="M16 6l3 0"/>
+            </svg>
+          </a>
+          <a class="tok-about-link" href="https://www.linkedin.com/in/lovro-grivić" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M17 2a5 5 0 0 1 5 5v10a5 5 0 0 1 -5 5h-10a5 5 0 0 1 -5 -5v-10a5 5 0 0 1 5 -5zm-9 8a1 1 0 0 0 -1 1v5a1 1 0 0 0 2 0v-5a1 1 0 0 0 -1 -1m6 0a3 3 0 0 0 -1.168 .236l-.125 .057a1 1 0 0 0 -1.707 .707v5a1 1 0 0 0 2 0v-3a1 1 0 0 1 2 0v3a1 1 0 0 0 2 0v-3a3 3 0 0 0 -3 -3m-6 -3a1 1 0 0 0 -.993 .883l-.007 .127a1 1 0 0 0 1.993 .117l.007 -.127a1 1 0 0 0 -1 -1"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      <div class="tok-modal-actions">
+        <button class="tok-modal-btn primary" id="tokAboutClose" data-i18n="close">Close</button>
       </div>
     </div>
   </div>
 
   <div class="tok-modal-backdrop" id="tokSongBackdrop">
     <div class="tok-modal">
-      <div class="tok-modal-title" id="tokSongTitle">Pjesma</div>
+      <div class="tok-modal-title" id="tokSongTitle">Song</div>
       <div class="tok-modal-text" id="tokSongArtist"></div>
       <div class="tok-song-fields">
         <label class="tok-song-field">BPM
           <input class="tok-modal-input" id="tokSongBpm" type="number" min="1" max="999" inputmode="numeric">
         </label>
-        <label class="tok-song-field">Key
+        <label class="tok-song-field"><span data-i18n="fieldKey">Key</span>
           <input class="tok-modal-input" id="tokSongKey" type="text" placeholder="npr. 8A">
         </label>
-        <label class="tok-song-field">Energy (1–5)
+        <label class="tok-song-field"><span data-i18n="fieldEnergy">Energy (1–5)</span>
           <input class="tok-modal-input" id="tokSongEnergy" type="number" min="1" max="5" inputmode="numeric">
         </label>
-        <label class="tok-song-field">Tagovi (zarezom)
+        <label class="tok-song-field"><span data-i18n="fieldTags">Tags (comma-separated)</span>
           <input class="tok-modal-input" id="tokSongTags" type="text" placeholder="house, chill, ...">
         </label>
       </div>
       <div class="tok-modal-error" id="tokSongError"></div>
       <div class="tok-modal-actions">
-        <button class="tok-modal-btn" id="tokSongCancel">Odustani</button>
-        <button class="tok-modal-btn primary" id="tokSongSave">Spremi</button>
+        <button class="tok-modal-btn" id="tokSongCancel" data-i18n="cancel">Cancel</button>
+        <button class="tok-modal-btn primary" id="tokSongSave" data-i18n="save">Save</button>
       </div>
     </div>
   </div>
 </div>
 
-<script src="engine.js?v=15"></script>
-<script src="app.js?v=15"></script>
+<script src="engine.js?v=116"></script>
+<script type="module" src="app.js?v=116"></script>
+<script type="module" src="js/dir-arrows.js?v=116"></script>
+  <audio id="tokLocalPlayer" style="display:none" preload="auto"></audio>
 </body>
 </html>
