@@ -89,6 +89,12 @@ html, body { height:100%; margin:0; }
 .tok-color-hue::-moz-range-thumb {
   width:18px; height:18px; border-radius:50%; background:#fff; border:2px solid rgba(0,0,0,0.35); cursor:pointer;
 }
+.tok-color-hex {
+  width:100%; box-sizing:border-box; border:none; border-radius:12px; padding:9px 12px;
+  background:rgba(255,255,255,0.06); color:var(--ink); font-family:'JetBrains Mono',monospace;
+  font-size:13px; text-transform:uppercase; outline:none;
+}
+.tok-color-hex:focus { box-shadow:0 0 0 1.5px var(--dusk); }
 .tok-color-reset {
   border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:13px;
   border-radius:999px; padding:8px 14px; background:transparent; color:var(--muted);

@@ -899,11 +899,13 @@ setInterval(() => {
   const slBox = document.getElementById('tokColorSL');
   const slThumb = document.getElementById('tokColorSLThumb');
   const hueInput = document.getElementById('tokColorHue');
+  const hexInput = document.getElementById('tokColorHexInput');
   const resetBtn = document.getElementById('tokColorReset');
   const appEl = document.querySelector('.tok-app');
-  if (!toggleBtn || !menu || !swatchesWrap || !customBtn || !customPanel || !slBox || !slThumb || !hueInput || !appEl) return;
+  if (!toggleBtn || !menu || !swatchesWrap || !customBtn || !customPanel || !slBox || !slThumb || !hueInput || !hexInput || !appEl) return;
   const DEFAULT_DUSK = '#E2401D';
   const STORAGE_KEY = 'tok_theme_dusk';
+  const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
   function hexToHsv(hex){
     const r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -958,6 +960,7 @@ setInterval(() => {
   function apply(color){
     appEl.style.setProperty('--dusk', color);
     markActiveSwatch(color);
+    hexInput.value = color.toUpperCase();
   }
   const saved = localStorage.getItem(STORAGE_KEY);
   hsv = hexToHsv(saved || DEFAULT_DUSK);
@@ -1013,6 +1016,18 @@ setInterval(() => {
     const hex = hsvToHex(hsv.h, hsv.s, hsv.v);
     apply(hex);
     localStorage.setItem(STORAGE_KEY, hex);
+  });
+
+  hexInput.addEventListener('input', () => {
+    const val = hexInput.value.trim();
+    if (!HEX_RE.test(val)) return;
+    hsv = hexToHsv(val);
+    slBox.style.backgroundColor = 'hsl(' + hsv.h + ', 100%, 50%)';
+    hueInput.value = hsv.h;
+    positionThumb();
+    appEl.style.setProperty('--dusk', val);
+    markActiveSwatch(val);
+    localStorage.setItem(STORAGE_KEY, val);
   });
 
   resetBtn.addEventListener('click', () => {
