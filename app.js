@@ -893,21 +893,27 @@ setInterval(() => {
 (function setupColorPicker(){
   const toggleBtn = document.getElementById('tokColorToggle');
   const menu = document.getElementById('tokColorMenu');
-  const input = document.getElementById('tokColorInput');
+  const swatchesWrap = document.getElementById('tokColorSwatches');
+  const hexInput = document.getElementById('tokColorHexInput');
   const resetBtn = document.getElementById('tokColorReset');
   const appEl = document.querySelector('.tok-app');
-  if (!toggleBtn || !menu || !input || !appEl) return;
+  if (!toggleBtn || !menu || !swatchesWrap || !hexInput || !appEl) return;
   const DEFAULT_DUSK = '#E2401D';
   const STORAGE_KEY = 'tok_theme_dusk';
+  const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
+  function markActiveSwatch(color){
+    swatchesWrap.querySelectorAll('.tok-color-swatch').forEach(sw => {
+      sw.classList.toggle('active', sw.dataset.color.toLowerCase() === color.toLowerCase());
+    });
+  }
   function apply(color){
     appEl.style.setProperty('--dusk', color);
+    hexInput.value = color.toUpperCase();
+    markActiveSwatch(color);
   }
   const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    input.value = saved;
-    apply(saved);
-  }
+  apply(saved || DEFAULT_DUSK);
 
   toggleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -918,13 +924,21 @@ setInterval(() => {
     if (e.target === toggleBtn || menu.contains(e.target)) return;
     menu.classList.remove('open');
   });
-  input.addEventListener('input', () => {
-    apply(input.value);
-    localStorage.setItem(STORAGE_KEY, input.value);
+  swatchesWrap.addEventListener('click', (e) => {
+    const sw = e.target.closest('.tok-color-swatch');
+    if (!sw) return;
+    apply(sw.dataset.color);
+    localStorage.setItem(STORAGE_KEY, sw.dataset.color);
+  });
+  hexInput.addEventListener('input', () => {
+    const val = hexInput.value.trim();
+    if (!HEX_RE.test(val)) return;
+    appEl.style.setProperty('--dusk', val);
+    markActiveSwatch(val);
+    localStorage.setItem(STORAGE_KEY, val);
   });
   resetBtn.addEventListener('click', () => {
-    input.value = DEFAULT_DUSK;
-    appEl.style.removeProperty('--dusk');
+    apply(DEFAULT_DUSK);
     localStorage.removeItem(STORAGE_KEY);
   });
 })();
