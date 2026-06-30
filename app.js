@@ -378,10 +378,38 @@ if (els.wordmark) attachLongPress(els.wordmark, '.tok-wordmark', openAboutModal)
 
 // ---------- fullscreen toggle ----------
 
+// Browsers drop fullscreen on screen-lock and block auto-reentry (requires a
+// user gesture). We track intent in localStorage and show a restore banner the
+// instant the screen is unlocked so one tap brings it back.
+
+let fsRestoreBanner = null;
+
+function dismissFsRestoreBanner(){
+  if (!fsRestoreBanner) return;
+  fsRestoreBanner.remove();
+  fsRestoreBanner = null;
+}
+
+function showFsRestoreBanner(){
+  if (fsRestoreBanner) return;
+  fsRestoreBanner = document.createElement('button');
+  fsRestoreBanner.className = 'tok-fs-restore';
+  fsRestoreBanner.textContent = '⛶ Tap to restore fullscreen';
+  fsRestoreBanner.addEventListener('click', () => {
+    dismissFsRestoreBanner();
+    (document.documentElement.requestFullscreen ? document.documentElement : document.body)
+      .requestFullscreen().catch(() => {});
+  });
+  document.body.appendChild(fsRestoreBanner);
+  // Auto-dismiss after 8 s so it doesn't linger if the user doesn't want it.
+  setTimeout(dismissFsRestoreBanner, 8000);
+}
+
 function updateFullscreenBtn(){
   if (!els.fullscreenToggle) return;
   els.fullscreenToggle.classList.toggle('active', !!document.fullscreenElement);
 }
+
 if (els.fullscreenToggle) {
   els.fullscreenToggle.addEventListener('click', () => {
     if (navigator.vibrate) navigator.vibrate(10);
@@ -389,11 +417,29 @@ if (els.fullscreenToggle) {
       (document.documentElement.requestFullscreen ? document.documentElement : document.body)
         .requestFullscreen().catch(() => {});
     } else {
+      localStorage.removeItem('tok_fullscreen');
       document.exitFullscreen().catch(() => {});
     }
   });
-  document.addEventListener('fullscreenchange', updateFullscreenBtn);
+  document.addEventListener('fullscreenchange', () => {
+    updateFullscreenBtn();
+    if (document.fullscreenElement) {
+      localStorage.setItem('tok_fullscreen', '1');
+      dismissFsRestoreBanner();
+    } else {
+      // Only clear intent when the user explicitly exits (via button above).
+      // Lock-screen exits don't clear it — we detect those via visibilitychange.
+    }
+  });
 }
+
+// When the screen unlocks (page becomes visible), check if fullscreen was lost
+// unintentionally (e.g. screen-lock) and surface the restore banner.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && localStorage.getItem('tok_fullscreen') === '1' && !document.fullscreenElement) {
+    showFsRestoreBanner();
+  }
+});
 if (els.aboutClose) els.aboutClose.addEventListener('click', closeAboutModal);
 if (els.aboutBackdrop) {
   els.aboutBackdrop.addEventListener('click', (e) => {
