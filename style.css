@@ -127,7 +127,7 @@ html, body { height:100%; margin:0; }
   top:50%; left:50%;
   width:113%; height:113%;
   border-radius:50%;
-  background: radial-gradient(circle, var(--wave-accent, var(--gold)) 0%, transparent 65%);
+  background: radial-gradient(circle, var(--dusk) 0%, transparent 65%);
   animation: tok-vinyl-glow 4.5s ease-in-out infinite;
   pointer-events:none;
 }
@@ -152,7 +152,7 @@ html, body { height:100%; margin:0; }
   position:absolute; inset:0; border-radius:50%; z-index:2; pointer-events:none;
   background:
     repeating-radial-gradient(circle farthest-side, rgba(0,0,0,0.45) 0px, rgba(0,0,0,0.45) 1px, rgba(255,255,255,0.14) 1px, rgba(255,255,255,0.14) 2px, transparent 2px, transparent 6px),
-    var(--vinyl-color, conic-gradient(from 0deg, #FF5A3C, #FFC857, #E2401D, #F0883E, #FF5A3C));
+    var(--dusk);
   box-shadow: 0 22px 50px rgba(0,0,0,0.55);
   -webkit-mask-image: radial-gradient(circle farthest-side, transparent 0 31%, black 33% 100%);
   mask-image: radial-gradient(circle farthest-side, transparent 0 31%, black 33% 100%);
@@ -185,12 +185,12 @@ html, body { height:100%; margin:0; }
   transform-origin: center;
   animation: tok-wave-breathe var(--dur, 1.8s) ease-in-out infinite var(--delay, 0s);
 }
-.tok-wave-bar.played { background: var(--wave-accent, var(--gold)); }
+.tok-wave-bar.played { background: var(--dusk); }
 
 .tok-wave-mini { display:flex; align-items:center; justify-content:center; gap:2px; height:14px; flex:1; min-width:18px; }
 .tok-wave-mini-bar {
   width:2px; height:100%; border-radius:2px;
-  background: var(--wave-accent, var(--gold));
+  background: var(--dusk);
   transform-origin: center;
   animation: tok-wave-breathe var(--dur, 1.4s) ease-in-out infinite var(--delay, 0s);
 }

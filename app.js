@@ -1,5 +1,4 @@
 import { fetchPlaylistTracks, fetchPlaylistInfo, fmtTime, extractPlaylistId } from './js/youtube-api.js';
-import { createVinylColorPicker } from './js/vinyl-color.js';
 import { attachLongPress } from './js/long-press.js';
 import { saveTracksCache, loadTracksCache, savePlaylistInfoCache, loadPlaylistInfoCache } from './js/track-cache.js';
 import { openContextMenu } from './js/context-menu.js';
@@ -83,8 +82,6 @@ const els = {
   aboutClose: document.getElementById('tokAboutClose'),
   fullscreenToggle: document.getElementById('tokFullscreenToggle')
 };
-
-const applyVinylColor = createVinylColorPicker();
 
 // ---------- waveform progress bar ----------
 
@@ -721,11 +718,6 @@ els.playlistInput.addEventListener('keydown', (e) => {
 
 // ---------- now-playing UI ----------
 
-function setVinylAccent(c){
-  document.querySelector('.tok-app').style.setProperty('--vinyl-color', c.bg);
-  document.querySelector('.tok-app').style.setProperty('--wave-accent', c.accent);
-}
-
 function updateMediaSession(t){
   if (!('mediaSession' in navigator)) return;
   navigator.mediaSession.metadata = new MediaMetadata({
@@ -737,7 +729,6 @@ function updateMediaSession(t){
 function updateNowPlayingUI(t){
   localStorage.setItem('tok_last_track_id', t.id);
   els.vinylImg.src = t.thumb;
-  applyVinylColor(t, (track) => tracks[currentIndex] === track, setVinylAccent);
   els.title.textContent = t.title;
   const nowBpm = window.TokEngine ? window.TokEngine.getBPM(t) : null;
   els.artist.textContent = t.artist + (nowBpm ? ' · ' + nowBpm + ' BPM' : '');
