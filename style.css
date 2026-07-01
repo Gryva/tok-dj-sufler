@@ -132,7 +132,6 @@ html, body { height:100%; margin:0; }
   pointer-events:none;
 }
 
-/* cover art sits behind the ring and spins on its own */
 .tok-vinyl-cover {
   position:absolute; inset: 18%; border-radius:50%; overflow:hidden;
   background-color: var(--stage); z-index:1;
@@ -277,7 +276,6 @@ html.tok-bg-paused .tok-dir-flow-arrows-track {
   animation-play-state: paused !important;
 }
 
-/* "play next" just swapped this card's track in */
 .tok-dir-replaced { animation: tok-dir-replaced-pulse 1.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1; }
 @keyframes tok-dir-replaced-pulse {
   0% { transform: scale(1); outline: 3px solid #FFC857; outline-offset: 0; box-shadow: 0 0 0 rgba(226,64,29,0); }
@@ -286,7 +284,7 @@ html.tok-bg-paused .tok-dir-flow-arrows-track {
   100% { transform: scale(1); outline: 0px solid transparent; outline-offset: 0; box-shadow: 0 0 0 rgba(226,64,29,0); }
 }
 .tok-dir-replaced::after {
-  content: '\2713 Queued next';
+  content: '✓ Queued next';
   position: absolute; top: 6px; right: 10px;
   background: #FFC857; color: #2A1A0E; font-size: 10px; font-weight: 800;
   padding: 3px 8px; border-radius: 999px; letter-spacing: 0.02em;
@@ -444,9 +442,9 @@ html.tok-bg-paused .tok-dir-flow-arrows-track {
   transform: scale(0.94) translateY(-10vh); transition: transform 0.25s ease;
 }
 .tok-modal-backdrop.open .tok-modal { transform: scale(1) translateY(-10vh); }
-#tokPlaylistBackdrop .tok-modal { transform: scale(0.94) translateY(-15vh); }
-#tokPlaylistBackdrop.open .tok-modal { transform: scale(1) translateY(-15vh); }
-.tok-modal-title { font-family:'Fraunces',serif; font-weight:900; font-size:18px; margin-bottom:14px; }
+#tokPlaylistBackdrop .tok-modal { transform: scale(0.94) translateY(-25vh); }
+#tokPlaylistBackdrop.open .tok-modal { transform: scale(1) translateY(-25vh); }
+.tok-modal-title { font-family:'Fraunces',serif; font-weight:900; font-size:18px; margin-bottom:6px; }
 .tok-modal-text { color:var(--muted); font-size:13px; margin-bottom:14px; line-height:1.4; }
 .tok-modal-input {
   width:100%; background:var(--sheet); border:1px solid rgba(255,255,255,0.1); border-radius:14px;
@@ -457,7 +455,7 @@ html.tok-bg-paused .tok-dir-flow-arrows-track {
 .tok-song-field { display:flex; flex-direction:column; gap:5px; font-size:12px; color:var(--muted); }
 .tok-song-field .tok-modal-input { margin-top:0; }
 .tok-modal-error { color:var(--dusk); font-size:12px; margin-top:8px; min-height:14px; }
-.tok-modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+.tok-modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
 .tok-modal-btn {
   border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:14px;
   border-radius:999px; padding:9px 18px; background:transparent; color:var(--muted);
@@ -497,6 +495,7 @@ html.tok-bg-paused .tok-dir-flow-arrows-track {
 
 .tok-playlist-saved-list { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; max-height:220px; overflow-y:auto; }
 .tok-playlist-saved-list:empty { display:none; }
+.tok-playlist-input-new { margin-top:0; }
 .tok-playlist-saved-row {
   display:flex; align-items:center; gap:10px; background:var(--sheet); border-radius:14px; padding:10px 12px;
 }
