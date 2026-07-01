@@ -11,7 +11,7 @@ applyStaticTranslations();
 if (window.TokEngine) window.TokEngine.init();
 
 const YT_API_KEY = 'AIzaSyCkZpbb-oVsH_s2Yjn5AAql3Pfke0MExTA';
-const DEFAULT_PLAYLIST_ID = 'PL9qqRdUh4PoNhlUS4g69SQTxteQKHVAe-';
+const DEFAULT_PLAYLIST_ID = 'PLeO0Nfll9hEw';
 const _storedId = localStorage.getItem('tok_playlist_id') || DEFAULT_PLAYLIST_ID;
 // Local playlists are session-only (object URLs don't survive page reloads)
 let PLAYLIST_ID = isLocalPlaylistId(_storedId) ? DEFAULT_PLAYLIST_ID : _storedId;
